@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LinkedIn Knowledge Graph Explorer</title>
+    
+    <!-- External Dependencies -->
+    <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+    
+    <!-- Styles -->
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>🔗 LinkedIn Knowledge Graph Explorer</h1>
+            <div class="controls">
+                <input type="file" id="csvFile" accept=".csv" style="display: none;">
+                <button class="btn" id="loadCsvBtn">📁 Load CSV</button>
+                <input type="text" id="searchBox" class="search-box" placeholder="🔍 Search connections...">
+                <button class="btn btn-secondary" id="resetViewBtn">🔄 Reset View</button>
+                <button class="btn btn-secondary" id="toggleSidebarBtn">ℹ️ Info Panel</button>
+                <button class="btn btn-success" id="exportGraphBtn">💾 Export Graph</button>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Graph Container -->
+            <div class="graph-container">
+                <div id="graph-root">
+                    <div class="initial-loading">
+                        <div class="spinner"></div>
+                        <div>Initializing graph visualization...</div>
+                    </div>
+                </div>
+                
+                <!-- View Controls -->
+                <div class="view-controls">
+                    <h3>View Options</h3>
+                    <div class="toggle-switch">
+                        <input type="checkbox" id="view3D">
+                        <label for="view3D">3D View</label>
+                    </div>
+                    <div class="toggle-switch">
+                        <input type="checkbox" id="viewClustering">
+                        <label for="viewClustering">Clustering</label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sidebar -->
+            <div class="sidebar" id="sidebar">
+                <h2>Connection Details</h2>
+                <div id="nodeInfo">
+                    <div class="empty-state">
+                        <p>Click on a node to view details</p>
+                    </div>
+                </div>
+                
+                <!-- Filters Section -->
+                <div class="filter-section">
+                    <h2>Filters</h2>
+                    <div class="filter-group">
+                        <label>Company</label>
+                        <input type="text" id="filterCompany" class="filter-input" placeholder="Filter by company...">
+                    </div>
+                    <div class="filter-group">
+                        <label>Position</label>
+                        <input type="text" id="filterPosition" class="filter-input" placeholder="Filter by position...">
+                    </div>
+                    <div class="filter-group">
+                        <label>Connected Date</label>
+                        <input type="text" id="filterDate" class="filter-input" placeholder="Filter by date...">
+                    </div>
+                </div>
+
+                <!-- LinkedIn Fetch Section -->
+                <div class="linkedin-fetch">
+                    <h3>🔗 Fetch LinkedIn Data</h3>
+                    <p class="fetch-description">
+                        Enter a LinkedIn profile URL to fetch additional data:
+                    </p>
+                    <input type="text" id="linkedinUrl" placeholder="https://www.linkedin.com/in/username" />
+                    <button class="btn" id="fetchDataBtn">Fetch Data</button>
+                    <button class="btn btn-success" id="expandBtn" disabled>
+                        🔍 Expand Connections
+                    </button>
+                    <div id="fetchStatus"></div>
+                </div>
+
+                <!-- Stats Section -->
+                <div class="stats-section">
+                    <h2>Network Statistics</h2>
+                    <div class="stats">
+                        <div class="stat-box">
+                            <div class="stat-value" id="totalNodes">0</div>
+                            <div class="stat-label">Connections</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-value" id="visibleNodes">0</div>
+                            <div class="stat-label">Visible</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-value" id="totalCompanies">0</div>
+                            <div class="stat-label">Companies</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Loading Overlay -->
+        <div class="loading hidden" id="loading">
+            <div class="spinner"></div>
+            <div id="loadingText">Loading connections...</div>
+        </div>
+
+        <!-- Notification -->
+        <div class="notification" id="notification"></div>
+    </div>
+
+    <!-- Application Script -->
+    <script type="module" src="app.js"></script>
+</body>
+</html>
