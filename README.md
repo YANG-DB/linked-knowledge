@@ -2,20 +2,46 @@
 
 A modern, interactive web application for visualizing and exploring your LinkedIn network connections using force-directed graph visualization.
 
+## 📸 Screenshots
+
+### Network Graph View
+![Network Graph](screenshots/network-graph.png)
+*Hierarchical visualization with you at the center, companies in the middle layer, and individual connections on the outer layer. Click a company node to highlight its connections.*
+
+### Timeline Chart
+![Timeline Chart](screenshots/timeline-chart.png)
+*Stacked bar chart showing connections over time by company. Scroll to zoom and explore different time periods. Synchronized with network graph selection.*
+
+### Bubble Chart
+![Bubble Chart](screenshots/bubble-chart.png)
+*Interactive bubble chart showing connection distribution across companies. Larger bubbles represent more connections.*
+
 ## 🌟 Features
 
 ### Core Functionality
-- **📊 Interactive Network Graph**: Visualize your entire LinkedIn network with you at the center
+- **📊 Interactive Network Graph**: Hierarchical visualization with you → companies → people
+- **📈 Timeline Chart**: Stacked bar chart showing connection growth over time
+- **⚪ Bubble Chart**: Company distribution visualization by connection count
 - **🔍 Smart Search**: Real-time search across names, companies, positions, and emails
-- **🎯 Advanced Filtering**: Filter connections by company, position, or connection date
+- **🎯 Company Filtering**: Multi-select company filter with color-coded legend
 - **📱 Responsive Design**: Works seamlessly on desktop and mobile devices
-- **💾 Data Export**: Export your network graph data as JSON
+- **💾 Batch Loading**: Gradual loading for large networks (network graph only)
 
 ### Visualization Options
-- **2D/3D Toggle**: Switch between 2D and 3D force-directed layouts
-- **Clustering**: Enable automatic clustering of connections
-- **Interactive Nodes**: Click nodes to view detailed information
-- **Color Coding**: Visual distinction between you (blue), connections (green), and selected nodes (yellow)
+- **Hierarchical Network**: 3-level structure (You → Companies → Connections)
+  - Dynamic company node sizes based on employee count
+  - Color-coded by company with automatic palette
+  - Click companies to highlight and filter
+  - Synchronized highlighting across all views
+- **Zoomable Timeline**: Interactive stacked bar chart
+  - Monthly aggregation of connections
+  - Scroll to zoom in/out
+  - Adaptive tick labels based on zoom level
+  - Synchronized with network graph selection
+- **Interactive Bubbles**: Packed circle layout
+  - Size represents connection count per company
+  - Zoom and pan support
+  - Tooltip with detailed counts
 
 ### Network Statistics
 - Total connections count
@@ -111,10 +137,8 @@ linkedin-graph-explorer/
 ## 🔧 Technical Details
 
 ### Dependencies (loaded via CDN)
-- **React 18**: UI framework
-- **ReactDOM 18**: React rendering
-- **Reagraph**: Graph visualization library
-- **PapaParse**: CSV parsing
+- **D3.js v7.8.5**: Data visualization and force-directed layouts
+- **PapaParse 5.4.1**: CSV parsing and data transformation
 
 ### Browser Support
 - Chrome/Edge: ✅ Full support
@@ -125,29 +149,30 @@ linkedin-graph-explorer/
 ## 🎨 Customization
 
 ### Changing Colors
-Edit `index.html` (inline script) to modify the theme:
+Company colors are automatically assigned from a predefined palette in `index.html`. To customize:
 ```javascript
-const theme = {
-    node: {
-        fill: '#28a745',      // Default node color
-        activeFill: '#ffc107' // Selected node color
-    },
-    edge: {
-        fill: '#848484',      // Edge color
-        activeFill: '#0077b5' // Active edge color
-    }
-};
+// Find this in buildCompanyFilter() function
+const colors = [
+    '#0077b5', '#28a745', '#dc3545', '#ffc107', '#17a2b8',
+    // Add more colors here
+];
 ```
 
-### Adjusting Layout
-Modify node sizes in the `buildGraph` function inside `index.html`:
+### Adjusting Force Layout
+Modify force parameters in the `buildForceDirectedTree` function:
 ```javascript
-const centralNode = {
-    id: 'central',
-    label: 'You',
-    fill: '#0077b5',
-    size: 30  // Adjust this value
-};
+simulation = d3.forceSimulation(nodes)
+    .force('charge', d3.forceManyBody().strength(-800))  // Repulsion strength
+    .force('radial', d3.forceRadial(d => {
+        if (d.depth === 1) return 280;  // Company radius
+        return 450;  // Person radius
+    }, width / 2, height / 2));
+```
+
+### Batch Size for Network Graph
+Adjust the number of connections loaded at once:
+```javascript
+const BATCH_SIZE = 100;  // Change this value (default: 100)
 ```
 
 ## 🔮 Future Enhancements

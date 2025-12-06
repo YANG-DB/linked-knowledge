@@ -8,8 +8,8 @@
 - `README.md` - Comprehensive documentation
 
 ### 2. **Synthetic Data**
-- `Connections.csv` - 1,869 LinkedIn connections (2010-2025)
-- `generate_connections.py` - Python script to generate data
+- `Connections.csv` - 1,869 LinkedIn synthetic generated connections (2010-2025)
+- `generate_connections.py` - Python script to generate synthetic data
 - `DATA_SUMMARY.md` - Detailed dataset statistics
 - `COMPARISON.md` - Before/after comparison
 
