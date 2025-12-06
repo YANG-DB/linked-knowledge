@@ -3,9 +3,8 @@
 ## 📦 What's Included
 
 ### 1. **Web Application Files**
-- `index.html` - Main application structure
+- `index.html` - Single-file application (HTML + JS)
 - `styles.css` - All styling and layout
-- `app.js` - Complete application logic
 - `README.md` - Comprehensive documentation
 
 ### 2. **Synthetic Data**
@@ -145,7 +144,7 @@ Edit the script to customize:
 - Time period
 
 ### Modify the Visualization
-Edit `app.js` to change:
+Edit the inline script in `index.html` to change:
 - Node colors
 - Node sizes
 - Layout algorithm
@@ -196,23 +195,15 @@ Edit `styles.css` to adjust:
 
 ### Application Files
 
-**index.html** (5.4KB)
-- Clean HTML5 structure
-- Semantic markup
-- No inline styles/scripts
+- **index.html** (single-file)
+- Bundles HTML, CSS hooks and application JavaScript inline
+- Self-contained: drop-in file to open in browser or serve via static host
 
 **styles.css** (7.5KB)
 - Modern responsive design
 - Glassmorphism effects
 - Mobile-friendly
 - Custom animations
-
-**app.js** (26KB)
-- React application
-- Graph visualization
-- Event handlers
-- CSV parsing
-- Export functionality
 
 ### Data Files
 

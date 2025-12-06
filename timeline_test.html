@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Timeline Test</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: Arial, sans-serif;
+            background: #1a1a2e;
+        }
+        #timeline {
+            width: 100%;
+            height: 600px;
+        }
+        .info {
+            color: white;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="info">
+        <h1 style="color: white;">LinkedIn Connections Timeline Test</h1>
+        <p style="color: #aaa;">This is a simplified test of the timeline chart. Generate sample data and see if it displays.</p>
+        <button onclick="generateData()" style="padding: 10px 20px; font-size: 16px;">Generate Sample Data</button>
+    </div>
+    <svg id="timeline"></svg>
+
+    <script>
+        function generateData() {
+            // Generate sample data spanning 5 years with various companies
+            const companies = ['Amazon', 'Google', 'Microsoft', 'Apple', 'Meta'];
+            const data = [];
+            const startDate = new Date(2020, 0, 1);
+
+            for (let i = 0; i < 500; i++) {
+                const daysOffset = Math.floor(Math.random() * 365 * 5);
+                const date = new Date(startDate.getTime() + daysOffset * 24 * 60 * 60 * 1000);
+                const company = companies[Math.floor(Math.random() * companies.length)];
+
+                data.push({
+                    connectedOn: d3.timeFormat('%d %b %Y')(date),
+                    company: company
+                });
+            }
+
+            console.log('Generated', data.length, 'sample connections');
+            console.log('Sample:', data.slice(0, 3));
+
+            buildTimelineChart(data);
+        }
+
+        function buildTimelineChart(data) {
+            console.log('Building timeline chart with', data.length, 'connections');
+
+            const width = 1200;
+            const height = 600;
+            const margin = {top: 40, right: 150, bottom: 80, left: 60};
+            const innerWidth = width - margin.left - margin.right;
+            const innerHeight = height - margin.top - margin.bottom;
+
+            // Clear existing
+            d3.select('#timeline').selectAll('*').remove();
+
+            // Parse dates and group by month and company
+            const parseDate = d3.timeParse('%d %b %Y');
+            const dataByDate = new Map();
+
+            let parsedCount = 0;
+
+            data.forEach(d => {
+                const date = parseDate(d.connectedOn);
+                if (!date) return;
+
+                parsedCount++;
+                const monthKey = d3.timeMonth.floor(date);
+                const company = d.company;
+
+                if (!dataByDate.has(monthKey)) {
+                    dataByDate.set(monthKey, new Map());
+                }
+
+                const monthData = dataByDate.get(monthKey);
+                monthData.set(company, (monthData.get(company) || 0) + 1);
+            });
+
+            console.log('Successfully parsed:', parsedCount);
+            console.log('Unique months:', dataByDate.size);
+
+            const allDates = Array.from(dataByDate.keys()).sort((a, b) => a - b);
+            if (allDates.length === 0) {
+                console.error('No dates parsed!');
+                return;
+            }
+
+            const minDate = allDates[0];
+            const maxDate = allDates[allDates.length - 1];
+
+            console.log('Date range:', minDate, 'to', maxDate);
+
+            // Create all months between min and max
+            const allMonths = d3.timeMonths(minDate, d3.timeMonth.offset(maxDate, 1));
+
+            // Get companies
+            const companies = Array.from(new Set(
+                Array.from(dataByDate.values()).flatMap(monthData => Array.from(monthData.keys()))
+            ));
+
+            console.log('Companies:', companies);
+            console.log('Total months:', allMonths.length);
+
+            // Build complete dataset
+            const stackData = allMonths.map(date => {
+                const obj = { date };
+                // Find the matching month in dataByDate by comparing time values
+                let monthData = null;
+                for (const [key, value] of dataByDate.entries()) {
+                    if (key.getTime() === date.getTime()) {
+                        monthData = value;
+                        break;
+                    }
+                }
+                if (!monthData) monthData = new Map();
+
+                companies.forEach(company => {
+                    obj[company] = monthData.get(company) || 0;
+                });
+                return obj;
+            });
+
+            console.log('Stack data sample:', stackData.slice(0, 3));
+
+            // Create stack
+            const stack = d3.stack()
+                .keys(companies)
+                .order(d3.stackOrderNone)
+                .offset(d3.stackOffsetNone);
+
+            const series = stack(stackData);
+            const maxValue = d3.max(series, d => d3.max(d, d => d[1]));
+
+            console.log('Max stack value:', maxValue);
+
+            if (!maxValue || maxValue === 0) {
+                console.error('No data in stack! Something is wrong.');
+                return;
+            }
+
+            // Create scales
+            const x = d3.scaleTime()
+                .domain([minDate, maxDate])
+                .range([0, innerWidth]);
+
+            const y = d3.scaleLinear()
+                .domain([0, maxValue])
+                .nice()
+                .range([innerHeight, 0]);
+
+            // Create SVG
+            const svg = d3.select('#timeline')
+                .attr('width', width)
+                .attr('height', height);
+
+            const g = svg.append('g')
+                .attr('transform', `translate(${margin.left},${margin.top})`);
+
+            // Colors
+            const colors = ['#0077b5', '#28a745', '#dc3545', '#ffc107', '#17a2b8'];
+            const companyColors = {};
+            companies.forEach((c, i) => companyColors[c] = colors[i % colors.length]);
+
+            // Create area generator
+            const area = d3.area()
+                .x(d => x(d.data.date))
+                .y0(d => y(d[0]))
+                .y1(d => y(d[1]))
+                .curve(d3.curveMonotoneX);
+
+            // Draw areas
+            const paths = g.selectAll('path')
+                .data(series)
+                .join('path')
+                .attr('fill', d => companyColors[d.key] || '#999')
+                .attr('d', area)
+                .attr('opacity', 0.7);
+
+            console.log('Paths created:', paths.size());
+
+            // Add axes
+            const xAxis = g.append('g')
+                .attr('transform', `translate(0,${innerHeight})`)
+                .call(d3.axisBottom(x).ticks(10));
+
+            const yAxis = g.append('g')
+                .call(d3.axisLeft(y));
+
+            xAxis.selectAll('text')
+                .attr('fill', '#fff')
+                .attr('transform', 'rotate(-45)')
+                .style('text-anchor', 'end');
+
+            yAxis.selectAll('text').attr('fill', '#fff');
+            xAxis.selectAll('.domain, .tick line').attr('stroke', '#999');
+            yAxis.selectAll('.domain, .tick line').attr('stroke', '#999');
+
+            // Add title
+            svg.append('text')
+                .attr('x', width / 2)
+                .attr('y', 20)
+                .attr('text-anchor', 'middle')
+                .attr('font-size', 18)
+                .attr('font-weight', 'bold')
+                .attr('fill', '#fff')
+                .text('Connections Over Time - Test');
+
+            // Add legend
+            const legend = svg.append('g')
+                .attr('transform', `translate(${width - margin.right + 10}, ${margin.top})`);
+
+            companies.forEach((company, i) => {
+                const legendRow = legend.append('g')
+                    .attr('transform', `translate(0, ${i * 20})`);
+
+                legendRow.append('rect')
+                    .attr('width', 15)
+                    .attr('height', 15)
+                    .attr('fill', companyColors[company]);
+
+                legendRow.append('text')
+                    .attr('x', 20)
+                    .attr('y', 12)
+                    .attr('font-size', 12)
+                    .attr('fill', '#fff')
+                    .text(company);
+            });
+
+            console.log('Chart built successfully!');
+        }
+
+        // Auto-generate on load
+        window.addEventListener('load', () => {
+            generateData();
+        });
+    </script>
+</body>
+</html>

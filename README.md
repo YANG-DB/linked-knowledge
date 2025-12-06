@@ -33,11 +33,11 @@ A modern, interactive web application for visualizing and exploring your LinkedI
 
 ### 1. Get Your LinkedIn Data
 
-1. Go to [LinkedIn Settings & Privacy](https://www.linkedin.com/mypreferences/d/download-my-data)
+1. Go to [LinkedIn Settings & Privacy](https://www.linkedin.com/{user-name}/d/download-my-data)
 2. Click "Get a copy of your data"
 3. Select "Connections" only (faster download)
 4. Click "Request archive"
-5. Wait for LinkedIn to email you (usually within 10 minutes)
+5. Wait for LinkedIn to email you 
 6. Download and extract the ZIP file
 7. Locate the `Connections.csv` file
 
@@ -45,7 +45,8 @@ A modern, interactive web application for visualizing and exploring your LinkedI
 
 **Option A: Open directly in browser**
 ```bash
-# Simply open index.html in your browser
+# Simply open the single HTML file in your browser
+# The application is now bundled into `index.html`
 open index.html  # macOS
 start index.html # Windows
 xdg-open index.html # Linux
@@ -102,9 +103,8 @@ npx http-server
 
 ```
 linkedin-graph-explorer/
-├── index.html          # Main HTML structure
+├── index.html # Single-file application (HTML + JS inline)
 ├── styles.css          # All styling and layout
-├── app.js             # Application logic and React components
 └── README.md          # This file
 ```
 
@@ -125,7 +125,7 @@ linkedin-graph-explorer/
 ## 🎨 Customization
 
 ### Changing Colors
-Edit `app.js` to modify the theme:
+Edit `index.html` (inline script) to modify the theme:
 ```javascript
 const theme = {
     node: {
@@ -140,7 +140,7 @@ const theme = {
 ```
 
 ### Adjusting Layout
-Modify node sizes in the `buildGraph` function:
+Modify node sizes in the `buildGraph` function inside `index.html`:
 ```javascript
 const centralNode = {
     id: 'central',

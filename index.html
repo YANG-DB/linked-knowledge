@@ -5,124 +5,2071 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LinkedIn Knowledge Graph Explorer</title>
     
-    <!-- External Dependencies -->
-    <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+    <!-- PapaParse for CSV parsing -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
     
-    <!-- Styles -->
-    <link rel="stylesheet" href="styles.css">
+    <!-- D3.js for graph visualization -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .container {
+            display: flex;
+            height: 100vh;
+            flex-direction: column;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 15px 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            z-index: 1000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .header h1 {
+            color: #0077b5;
+            font-size: 24px;
+            font-weight: 600;
+        }
+
+        .controls {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .search-box {
+            padding: 8px 15px;
+            border: 2px solid #ddd;
+            border-radius: 20px;
+            font-size: 14px;
+            width: 250px;
+            transition: border-color 0.3s;
+        }
+
+        .search-box:focus {
+            outline: none;
+            border-color: #0077b5;
+        }
+
+        .btn {
+            padding: 8px 20px;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s;
+            background: #0077b5;
+            color: white;
+        }
+
+        .btn:hover {
+            background: #005885;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+
+        .btn-success {
+            background: #28a745;
+        }
+
+        .btn-success:hover {
+            background: #218838;
+        }
+
+        .main-content {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+            flex-direction: column;
+        }
+
+        .viz-tabs {
+            display: flex;
+            background: rgba(255, 255, 255, 0.95);
+            border-bottom: 2px solid #ddd;
+            padding: 0 20px;
+        }
+
+        .viz-tab {
+            padding: 12px 24px;
+            cursor: pointer;
+            border: none;
+            background: none;
+            font-size: 14px;
+            font-weight: 500;
+            color: #6c757d;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+        }
+
+        .viz-tab:hover {
+            color: #0077b5;
+        }
+
+        .viz-tab.active {
+            color: #0077b5;
+            border-bottom-color: #0077b5;
+        }
+
+        .viz-content {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        .viz-panel {
+            display: none;
+            flex: 1;
+            position: relative;
+        }
+
+        .graph-container {
+            flex: 1;
+            position: relative;
+            background: #1a1a2e;
+        }
+
+        .viz-panel.active {
+            display: flex;
+            flex: 1;
+        }
+
+        #graph, #timelineChart, #bubbleChart {
+            width: 100%;
+            height: 100%;
+        }
+
+        .sidebar {
+            width: 350px;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 20px;
+            overflow-y: auto;
+            box-shadow: -2px 0 10px rgba(0,0,0,0.1);
+            display: none;
+        }
+
+        .sidebar.active {
+            display: block;
+        }
+
+        .sidebar h2 {
+            color: #0077b5;
+            margin-bottom: 15px;
+            font-size: 20px;
+        }
+
+        .company-filter-section {
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .company-filter-section h3 {
+            font-size: 16px;
+            color: #495057;
+            margin-bottom: 10px;
+        }
+
+        .company-list {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .company-item {
+            display: flex;
+            align-items: center;
+            padding: 8px;
+            margin-bottom: 5px;
+            background: white;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .company-item:hover {
+            background: #e3f2fd;
+        }
+
+        .company-item input[type="checkbox"] {
+            margin-right: 10px;
+            cursor: pointer;
+        }
+
+        .company-icon {
+            width: 24px;
+            height: 24px;
+            border-radius: 4px;
+            margin-right: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+            color: white;
+            flex-shrink: 0;
+        }
+
+        .company-name {
+            flex: 1;
+            font-size: 13px;
+            color: #212529;
+        }
+
+        .company-count {
+            font-size: 11px;
+            color: #6c757d;
+            background: #e9ecef;
+            padding: 2px 8px;
+            border-radius: 10px;
+        }
+
+        .filter-actions {
+            display: flex;
+            gap: 5px;
+            margin-top: 10px;
+        }
+
+        .filter-btn {
+            padding: 5px 10px;
+            border: none;
+            border-radius: 5px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .filter-btn.select-all {
+            background: #28a745;
+            color: white;
+        }
+
+        .filter-btn.select-all:hover {
+            background: #218838;
+        }
+
+        .filter-btn.clear-all {
+            background: #dc3545;
+            color: white;
+        }
+
+        .filter-btn.clear-all:hover {
+            background: #c82333;
+        }
+
+        .node-info {
+            margin-bottom: 20px;
+        }
+
+        .info-item {
+            margin-bottom: 10px;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .info-label {
+            font-weight: 600;
+            color: #495057;
+            font-size: 12px;
+            text-transform: uppercase;
+            margin-bottom: 5px;
+        }
+
+        .info-value {
+            color: #212529;
+            font-size: 14px;
+            word-break: break-word;
+        }
+
+        .stats {
+            display: flex;
+            gap: 15px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+
+        .stat-box {
+            background: #e3f2fd;
+            padding: 10px 15px;
+            border-radius: 8px;
+            text-align: center;
+            flex: 1;
+            min-width: 100px;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #0077b5;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #6c757d;
+            margin-top: 5px;
+        }
+
+        .filter-section {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 2px solid #e9ecef;
+        }
+
+        .filter-group {
+            margin-bottom: 15px;
+        }
+
+        .filter-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+            color: #495057;
+            font-size: 14px;
+        }
+
+        .filter-input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+
+        .loading {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(255, 255, 255, 0.95);
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+            z-index: 2000;
+            text-align: center;
+        }
+
+        .loading.hidden {
+            display: none;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #0077b5;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #28a745;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            z-index: 3000;
+            display: none;
+        }
+
+        .notification.error {
+            background: #dc3545;
+        }
+
+        .notification.show {
+            display: block;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .tooltip {
+            position: absolute;
+            background: rgba(0, 0, 0, 0.9);
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 12px;
+            pointer-events: none;
+            z-index: 1000;
+            display: none;
+        }
+    </style>
 </head>
 <body>
     <div class="container">
-        <!-- Header -->
         <div class="header">
             <h1>🔗 LinkedIn Knowledge Graph Explorer</h1>
             <div class="controls">
                 <input type="file" id="csvFile" accept=".csv" style="display: none;">
-                <button class="btn" id="loadCsvBtn">📁 Load CSV</button>
-                <input type="text" id="searchBox" class="search-box" placeholder="🔍 Search connections...">
-                <button class="btn btn-secondary" id="resetViewBtn">🔄 Reset View</button>
-                <button class="btn btn-secondary" id="toggleSidebarBtn">ℹ️ Info Panel</button>
-                <button class="btn btn-success" id="exportGraphBtn">💾 Export Graph</button>
+                <button class="btn" onclick="loadCSV()">📁 Load CSV</button>
+                <button class="btn btn-success" onclick="loadNextBatch()" id="loadMoreBtn" style="display: none;">➕ Load More (100)</button>
+                <span id="connectionCount" style="background: white; padding: 8px 15px; border-radius: 20px; font-weight: 600; color: #0077b5; display: none;">0 connections</span>
+                <input type="text" id="searchBox" class="search-box" placeholder="🔍 Search connections..." oninput="handleSearch()">
+                <button class="btn btn-secondary" onclick="resetView()">🔄 Reset View</button>
+                <button class="btn btn-secondary" onclick="toggleSidebar()">ℹ️ Info Panel</button>
+                <button class="btn btn-success" onclick="exportGraph()">💾 Export Graph</button>
             </div>
         </div>
 
-        <!-- Main Content -->
         <div class="main-content">
-            <!-- Graph Container -->
-            <div class="graph-container">
-                <div id="graph-root">
-                    <div class="initial-loading">
-                        <div class="spinner"></div>
-                        <div>Initializing graph visualization...</div>
-                    </div>
-                </div>
-                
-                <!-- View Controls -->
-                <div class="view-controls">
-                    <h3>View Options</h3>
-                    <div class="toggle-switch">
-                        <input type="checkbox" id="view3D">
-                        <label for="view3D">3D View</label>
-                    </div>
-                    <div class="toggle-switch">
-                        <input type="checkbox" id="viewClustering">
-                        <label for="viewClustering">Clustering</label>
-                    </div>
-                </div>
+            <div class="viz-tabs">
+                <button class="viz-tab active" onclick="switchViz('graph')">🔗 Network Graph</button>
+                <button class="viz-tab" onclick="switchViz('timeline')">📊 Timeline</button>
+                <button class="viz-tab" onclick="switchViz('bubble')">⚪ Bubble Chart</button>
             </div>
-
-            <!-- Sidebar -->
-            <div class="sidebar" id="sidebar">
+            <div class="viz-content">
+                <div class="viz-panel active" id="graphPanel">
+                    <div class="graph-container">
+                        <svg id="graph"></svg>
+                        <div class="tooltip" id="tooltip"></div>
+                    </div>
+                </div>
+                <div class="viz-panel" id="timelinePanel">
+                    <div class="graph-container">
+                        <svg id="timelineChart"></svg>
+                    </div>
+                </div>
+                <div class="viz-panel" id="bubblePanel">
+                    <div class="graph-container">
+                        <svg id="bubbleChart"></svg>
+                    </div>
+                </div>
+                <div class="sidebar" id="sidebar">
                 <h2>Connection Details</h2>
                 <div id="nodeInfo">
-                    <div class="empty-state">
-                        <p>Click on a node to view details</p>
+                    <p style="color: #6c757d; font-size: 14px;">Click on a node to view details</p>
+                </div>
+                <div class="stats" id="stats" style="display: none;">
+                    <div class="stat-box">
+                        <div class="stat-value" id="displayedConnections">0</div>
+                        <div class="stat-label">Displayed (Graph)</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-value" id="totalConnections">0</div>
+                        <div class="stat-label">Total (All Views)</div>
                     </div>
                 </div>
                 
-                <!-- Filters Section -->
+                <div class="company-filter-section" id="companyFilterSection" style="display: none;">
+                    <h3>🏢 Filter by Company</h3>
+                    <div class="filter-actions">
+                        <button class="filter-btn select-all" onclick="selectAllCompanies()">Select All</button>
+                        <button class="filter-btn clear-all" onclick="clearAllCompanies()">Clear All</button>
+                    </div>
+                    <div style="margin: 10px 0; padding: 10px; background: white; border-radius: 5px;">
+                        <label style="display: flex; align-items: center; cursor: pointer; font-size: 13px;">
+                            <input type="checkbox" id="clusterToggle" onchange="toggleClustering(this.checked)" style="margin-right: 8px;">
+                            <span>🔗 Enable Company Clustering</span>
+                        </label>
+                    </div>
+                    <div class="company-list" id="companyList"></div>
+                </div>
+                
                 <div class="filter-section">
                     <h2>Filters</h2>
                     <div class="filter-group">
                         <label>Company</label>
-                        <input type="text" id="filterCompany" class="filter-input" placeholder="Filter by company...">
+                        <input type="text" id="filterCompany" class="filter-input" placeholder="Filter by company..." onkeyup="applyFilters()">
                     </div>
                     <div class="filter-group">
                         <label>Position</label>
-                        <input type="text" id="filterPosition" class="filter-input" placeholder="Filter by position...">
+                        <input type="text" id="filterPosition" class="filter-input" placeholder="Filter by position..." onkeyup="applyFilters()">
                     </div>
                     <div class="filter-group">
                         <label>Connected Date</label>
-                        <input type="text" id="filterDate" class="filter-input" placeholder="Filter by date...">
-                    </div>
-                </div>
-
-                <!-- LinkedIn Fetch Section -->
-                <div class="linkedin-fetch">
-                    <h3>🔗 Fetch LinkedIn Data</h3>
-                    <p class="fetch-description">
-                        Enter a LinkedIn profile URL to fetch additional data:
-                    </p>
-                    <input type="text" id="linkedinUrl" placeholder="https://www.linkedin.com/in/username" />
-                    <button class="btn" id="fetchDataBtn">Fetch Data</button>
-                    <button class="btn btn-success" id="expandBtn" disabled>
-                        🔍 Expand Connections
-                    </button>
-                    <div id="fetchStatus"></div>
-                </div>
-
-                <!-- Stats Section -->
-                <div class="stats-section">
-                    <h2>Network Statistics</h2>
-                    <div class="stats">
-                        <div class="stat-box">
-                            <div class="stat-value" id="totalNodes">0</div>
-                            <div class="stat-label">Connections</div>
-                        </div>
-                        <div class="stat-box">
-                            <div class="stat-value" id="visibleNodes">0</div>
-                            <div class="stat-label">Visible</div>
-                        </div>
-                        <div class="stat-box">
-                            <div class="stat-value" id="totalCompanies">0</div>
-                            <div class="stat-label">Companies</div>
-                        </div>
+                        <input type="text" id="filterDate" class="filter-input" placeholder="Filter by date..." onkeyup="applyFilters()">
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Loading Overlay -->
-        <div class="loading hidden" id="loading">
+        <div class="loading" id="loading">
             <div class="spinner"></div>
-            <div id="loadingText">Loading connections...</div>
+            <div id="loadingText">Click "Load CSV" to import your LinkedIn connections</div>
         </div>
 
-        <!-- Notification -->
         <div class="notification" id="notification"></div>
     </div>
 
-    <!-- Application Script -->
-    <script type="module" src="app.js"></script>
+    <script>
+        let allData = [];
+        let filteredData = [];
+        let displayedData = [];
+        let simulation;
+        let svg, g, link, node, text;
+        let selectedNode = null;
+        let currentBatch = 0;
+        const BATCH_SIZE = 100;
+        let isLoading = false;
+        let selectedCompanies = new Set();
+        let companyColors = {};
+        let clusteringEnabled = false;
+        let currentViz = 'graph';
+        
+        // Initialize
+        document.getElementById('csvFile').addEventListener('change', handleFileSelect);
+        
+        function switchViz(vizType) {
+            currentViz = vizType;
+            
+            // Update tabs
+            document.querySelectorAll('.viz-tab').forEach(tab => tab.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            // Update panels
+            document.querySelectorAll('.viz-panel').forEach(panel => panel.classList.remove('active'));
+            
+            // Show/hide Load More button based on viz type
+            const loadMoreBtn = document.getElementById('loadMoreBtn');
+            
+            if (vizType === 'graph') {
+                document.getElementById('graphPanel').classList.add('active');
+                // Show load more only if there's more data
+                if (displayedData.length < filteredData.length) {
+                    loadMoreBtn.style.display = 'inline-block';
+                }
+            } else if (vizType === 'timeline') {
+                document.getElementById('timelinePanel').classList.add('active');
+                loadMoreBtn.style.display = 'none'; // Hide load more
+                // Use ALL filtered data for timeline
+                buildTimelineChart(filteredData);
+            } else if (vizType === 'bubble') {
+                document.getElementById('bubblePanel').classList.add('active');
+                loadMoreBtn.style.display = 'none'; // Hide load more
+                // Use ALL filtered data for bubble chart
+                buildBubbleChart(filteredData);
+            }
+        }
+        
+        function toggleClustering(enabled) {
+            clusteringEnabled = enabled;
+            console.log('Clustering toggled:', enabled);
+            
+            // Rebuild graph with clustering
+            if (displayedData.length > 0) {
+                buildGraph(displayedData);
+            }
+            
+            if (enabled) {
+                showNotification('Company clustering enabled! Nodes grouped by company.', 'success');
+            } else {
+                showNotification('Company clustering disabled.', 'success');
+            }
+        }
+        
+        function buildCompanyFilter() {
+            // Count connections per company
+            const companyCounts = {};
+            allData.forEach(conn => {
+                const company = conn.company || 'Unknown';
+                companyCounts[company] = (companyCounts[company] || 0) + 1;
+            });
+            
+            // Sort companies by count (descending)
+            const sortedCompanies = Object.entries(companyCounts)
+                .sort((a, b) => b[1] - a[1]);
+            
+            // Generate colors for each company
+            const colors = [
+                '#0077b5', '#28a745', '#dc3545', '#ffc107', '#17a2b8', 
+                '#6f42c1', '#fd7e14', '#20c997', '#e83e8c', '#6c757d',
+                '#007bff', '#28a745', '#ffc107', '#dc3545', '#17a2b8'
+            ];
+            
+            sortedCompanies.forEach(([company], index) => {
+                companyColors[company] = colors[index % colors.length];
+                selectedCompanies.add(company); // All selected by default
+            });
+            
+            // Build HTML
+            const companyListHtml = sortedCompanies.map(([company, count]) => {
+                const initial = company.charAt(0).toUpperCase();
+                const color = companyColors[company];
+                
+                return `
+                    <div class="company-item" onclick="toggleCompany('${escapeHtml(company)}')">
+                        <input type="checkbox" 
+                               id="company_${escapeHtml(company)}" 
+                               checked 
+                               onchange="handleCompanyCheckbox('${escapeHtml(company)}', event)">
+                        <div class="company-icon" style="background: ${color};">
+                            ${initial}
+                        </div>
+                        <div class="company-name">${escapeHtml(company)}</div>
+                        <div class="company-count">${count}</div>
+                    </div>
+                `;
+            }).join('');
+            
+            document.getElementById('companyList').innerHTML = companyListHtml;
+            document.getElementById('companyFilterSection').style.display = 'block';
+        }
+        
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+        
+        function toggleCompany(company) {
+            const checkbox = document.getElementById(`company_${company}`);
+            if (checkbox) {
+                checkbox.checked = !checkbox.checked;
+                handleCompanyCheckbox(company, checkbox.checked);
+            }
+        }
+        
+        function handleCompanyCheckbox(company, eventOrChecked) {
+            // Handle both real events and boolean values
+            let isChecked;
+            if (typeof eventOrChecked === 'boolean') {
+                isChecked = eventOrChecked;
+            } else {
+                if (eventOrChecked.stopPropagation) {
+                    eventOrChecked.stopPropagation();
+                }
+                isChecked = eventOrChecked.target.checked;
+            }
+            
+            if (isChecked) {
+                selectedCompanies.add(company);
+            } else {
+                selectedCompanies.delete(company);
+            }
+            
+            applyCompanyFilter();
+        }
+        
+        function selectAllCompanies() {
+            selectedCompanies.clear();
+            Object.keys(companyColors).forEach(company => {
+                selectedCompanies.add(company);
+                const checkbox = document.getElementById(`company_${company}`);
+                if (checkbox) checkbox.checked = true;
+            });
+            applyCompanyFilter();
+        }
+        
+        function clearAllCompanies() {
+            selectedCompanies.clear();
+            Object.keys(companyColors).forEach(company => {
+                const checkbox = document.getElementById(`company_${company}`);
+                if (checkbox) checkbox.checked = false;
+            });
+            applyCompanyFilter();
+        }
+        
+        function applyCompanyFilter() {
+            console.log('=== APPLYING COMPANY FILTER ===');
+            console.log('Selected companies:', Array.from(selectedCompanies));
+            
+            // Filter data based on selected companies
+            filteredData = allData.filter(conn => {
+                const company = conn.company || 'Unknown';
+                return selectedCompanies.has(company);
+            });
+            
+            console.log(`Filtered to ${filteredData.length} connections`);
+            
+            // Reset to first batch
+            currentBatch = 1;
+            displayedData = filteredData.slice(0, Math.min(BATCH_SIZE, filteredData.length));
+            
+            // Rebuild graph
+            buildGraph(displayedData);
+            updateStats();
+            updateLoadMoreButton();
+            
+            // Update aggregate visualizations with ALL filtered data
+            buildTimelineChart(filteredData);
+            buildBubbleChart(filteredData);
+            
+            showNotification(`Showing ${filteredData.length} connections from ${selectedCompanies.size} companies`, 'success');
+        }
+        
+        function loadCSV() {
+            document.getElementById('csvFile').click();
+        }
+        
+        function handleFileSelect(event) {
+            const file = event.target.files[0];
+            if (file) {
+                showLoading(true);
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    parseCSV(e.target.result);
+                };
+                reader.readAsText(file);
+            }
+        }
+        
+        function parseCSV(csvText) {
+            Papa.parse(csvText, {
+                header: true,
+                skipEmptyLines: true,
+                dynamicTyping: false,
+                transformHeader: function(header) {
+                    // Clean up headers - remove BOM and special characters
+                    return header.trim().replace(/^\uFEFF/, '');
+                },
+                complete: function(results) {
+                    console.log('Parsed CSV data:', results);
+                    console.log('Total rows:', results.data.length);
+                    console.log('Headers:', results.meta.fields);
+                    console.log('Sample rows:', results.data.slice(0, 3));
+                    
+                    // Filter out empty rows and map data
+                    const filtered = results.data.filter(row => {
+                        const firstName = (row['First Name'] || '').trim();
+                        return firstName && firstName !== 'Notes:' && firstName.length > 0;
+                    });
+                    
+                    console.log('Filtered rows:', filtered.length);
+                    
+                    allData = filtered.map((row, index) => {
+                        // Clean up special unicode characters from names
+                        const firstName = (row['First Name'] || '').trim()
+                            .replace(/[\u202a\u202c\u200f\u200e]/g, ''); // Remove direction marks
+                        const lastName = (row['Last Name'] || '').trim()
+                            .replace(/[\u202a\u202c\u200f\u200e]/g, '');
+                        
+                        return {
+                            id: index,
+                            firstName: firstName,
+                            lastName: lastName,
+                            fullName: `${firstName} ${lastName}`.trim(),
+                            company: (row['Company'] || 'Unknown').trim(),
+                            position: (row['Position'] || 'Unknown').trim(),
+                            email: (row['Email Address'] || '').trim(),
+                            url: (row['URL'] || '').trim(),
+                            connectedOn: (row['Connected On'] || '').trim()
+                        };
+                    });
+                    
+                    console.log('Final data count:', allData.length);
+                    console.log('Sample processed data:', allData.slice(0, 3));
+                    
+                    if (allData.length === 0) {
+                        showLoading(false);
+                        showNotification('No connections found in CSV. Please check the file format.', 'error');
+                        console.error('Available columns:', results.meta.fields);
+                        return;
+                    }
+                    
+                    filteredData = [...allData];
+                    currentBatch = 0;
+                    
+                    // Initialize displayedData with only first batch
+                    displayedData = filteredData.slice(0, Math.min(BATCH_SIZE, filteredData.length));
+                    
+                    console.log(`Initial load: displaying ${displayedData.length} of ${filteredData.length} total connections`);
+                    
+                    // Build company filter list
+                    buildCompanyFilter();
+                    
+                    // Build graph with only the first batch
+                    buildGraph(displayedData);
+                    currentBatch = 1; // Set to 1 since we've loaded the first batch
+                    
+                    showLoading(false);
+                    showNotification(`Loaded ${displayedData.length} of ${allData.length} connections. Click "Load More" to see more!`, 'success');
+                    updateStats();
+                    
+                    // Build aggregate visualizations with ALL data
+                    buildTimelineChart(filteredData);
+                    buildBubbleChart(filteredData);
+                },
+                error: function(error) {
+                    showLoading(false);
+                    showNotification('Error parsing CSV: ' + error.message, 'error');
+                    console.error('Parse error:', error);
+                }
+            });
+        }
+        
+        function loadNextBatch() {
+            if (isLoading) return;
+            
+            const start = currentBatch * BATCH_SIZE;
+            const end = Math.min(start + BATCH_SIZE, filteredData.length);
+            
+            if (start >= filteredData.length) {
+                return; // All data loaded
+            }
+            
+            isLoading = true;
+            
+            // Only get the data up to the current end point
+            displayedData = filteredData.slice(0, end);
+            
+            console.log(`Loading batch ${currentBatch + 1}: showing ${displayedData.length} of ${filteredData.length} total`);
+            
+            // Rebuild graph with current displayed data (only for graph view)
+            if (currentViz === 'graph') {
+                buildGraph(displayedData);
+            }
+            
+            currentBatch++;
+            isLoading = false;
+            
+            updateStats();
+            updateLoadMoreButton();
+            
+            if (end < filteredData.length) {
+                showNotification(`Showing ${end} of ${filteredData.length} connections. Click "Load More" to see more!`, 'success');
+            } else {
+                showNotification(`All ${filteredData.length} connections loaded!`, 'success');
+            }
+        }
+        
+        function buildGraph(data) {
+            console.log(`=== BUILD GRAPH CALLED ===`);
+            console.log(`Building force-directed tree with ${data.length} connections`);
+            
+            const width = document.getElementById('graph').clientWidth;
+            const height = document.getElementById('graph').clientHeight;
+            
+            // Clear existing graph
+            d3.select('#graph').selectAll('*').remove();
+            
+            // Setup SVG
+            svg = d3.select('#graph')
+                .attr('width', width)
+                .attr('height', height);
+            
+            // Add zoom behavior
+            const zoom = d3.zoom()
+                .scaleExtent([0.1, 4])
+                .on('zoom', (event) => {
+                    g.attr('transform', event.transform);
+                });
+            
+            svg.call(zoom);
+            
+            g = svg.append('g');
+            
+            // Build force-directed tree
+            buildForceDirectedTree(data, width, height);
+        }
+        
+        function buildForceDirectedTree(data, width, height) {
+            // Group connections by company
+            const companiesMap = new Map();
+            data.forEach(d => {
+                const company = d.company || 'Unknown';
+                if (!companiesMap.has(company)) {
+                    companiesMap.set(company, []);
+                }
+                companiesMap.get(company).push(d);
+            });
+
+            // Create hierarchical structure: You -> Companies -> People
+            const root = {
+                id: 'central',
+                name: 'You',
+                type: 'central',
+                children: Array.from(companiesMap.entries()).map(([companyName, employees]) => ({
+                    id: `company_${companyName}`,
+                    name: companyName,
+                    type: 'company',
+                    company: companyName,
+                    children: employees.map(d => ({
+                        id: d.id,
+                        name: d.fullName,
+                        type: 'person',
+                        data: d,
+                        company: companyName
+                    }))
+                }))
+            };
+
+            // Convert to hierarchy
+            const hierarchy = d3.hierarchy(root);
+            const links = hierarchy.links();
+            const nodes = hierarchy.descendants();
+
+            // Calculate radius scale for company nodes based on employee count
+            const companySizes = nodes.filter(d => d.depth === 1).map(d => d.children ? d.children.length : 0);
+            const maxCompanySize = Math.max(...companySizes);
+            const minCompanySize = Math.min(...companySizes);
+
+            // Scale for company node radius (10 to 30 based on employee count)
+            const radiusScale = d3.scaleLinear()
+                .domain([minCompanySize, maxCompanySize])
+                .range([10, 30]);
+
+            // Create force simulation for tree layout with 3 levels
+            simulation = d3.forceSimulation(nodes)
+                .force('link', d3.forceLink(links)
+                    .id(d => d.id)
+                    .distance(d => {
+                        // Longer distances for more spread
+                        return d.source.depth === 0 ? 180 : 80;
+                    })
+                    .strength(0.3))  // Reduced from 0.7 to 0.3 for looser connections
+                .force('charge', d3.forceManyBody().strength(d => {
+                    // Stronger repulsion for all nodes to spread them apart
+                    if (d.depth === 0) return -1000;  // You - strong repulsion
+                    if (d.depth === 1) return -800;   // Companies - strong repulsion
+                    return -100;                       // People - moderate repulsion
+                }))
+                .force('center', d3.forceCenter(width / 2, height / 2))
+                .force('collision', d3.forceCollide().radius(d => {
+                    // Dynamic collision radius based on node size
+                    if (d.depth === 0) return 30;
+                    if (d.depth === 1) {
+                        const employeeCount = d.children ? d.children.length : 0;
+                        return radiusScale(employeeCount) + 15;  // Add padding
+                    }
+                    return 15;
+                }))
+                .force('radial', d3.forceRadial(d => {
+                    // Increased radii for more spread
+                    if (d.depth === 0) return 0;
+                    if (d.depth === 1) return 280;  // Companies further out
+                    return 450;                      // People even further out
+                }, width / 2, height / 2).strength(0.4));  // Reduced from 0.5 to 0.4
+            
+            // Create links
+            link = g.append('g')
+                .selectAll('line')
+                .data(links)
+                .join('line')
+                .attr('stroke', '#999')
+                .attr('stroke-opacity', 0.4)
+                .attr('stroke-width', 1.5);
+            
+            // Create nodes with different sizes for each level
+            node = g.append('g')
+                .selectAll('circle')
+                .data(nodes)
+                .join('circle')
+                .attr('r', d => {
+                    if (d.depth === 0) return 25;      // You (center) - largest
+                    if (d.depth === 1) {
+                        // Company nodes - size based on employee count
+                        const employeeCount = d.children ? d.children.length : 0;
+                        return radiusScale(employeeCount);
+                    }
+                    return 6;                           // Person nodes - smallest
+                })
+                .attr('fill', d => {
+                    if (d.depth === 0) return '#0077b5';  // You - LinkedIn blue
+                    if (d.depth === 1) {
+                        // Company nodes - use company color
+                        const company = d.data.company || 'Unknown';
+                        return companyColors[company] || '#28a745';
+                    }
+                    // Person nodes - lighter version of company color
+                    const company = d.data?.company || 'Unknown';
+                    const color = companyColors[company] || '#28a745';
+                    // Lighten the color for person nodes
+                    return d3.color(color).brighter(0.5);
+                })
+                .attr('stroke', d => {
+                    if (d.depth === 0) return '#fff';
+                    if (d.depth === 1) return '#fff';
+                    return '#ddd';
+                })
+                .attr('stroke-width', d => d.depth === 1 ? 3 : 2)
+                .attr('opacity', d => d.depth === 2 ? 0.8 : 1)
+                .style('cursor', 'pointer')
+                .call(drag(simulation))
+                .on('click', (event, d) => {
+                    event.stopPropagation();  // Prevent event bubbling
+
+                    if (d.depth === 1) {
+                        // Company node clicked - toggle highlight
+                        handleCompanyHighlight(d);
+                    } else if (d.depth === 2) {
+                        // Person node clicked
+                        handleNodeClick({
+                            id: d.data.id,
+                            name: d.data.name,
+                            type: d.data.type,
+                            data: d.data.data
+                        });
+                    } else if (d.depth === 0) {
+                        // "You" node clicked - reset highlight
+                        resetHighlight();
+                    }
+                })
+                .on('mouseover', (event, d) => {
+                    const tooltipData = {
+                        name: d.data.name
+                    };
+                    if (d.depth === 1) {
+                        // Show company name and count
+                        tooltipData.name = `${d.data.name} (${d.children ? d.children.length : 0} connections)`;
+                    }
+                    showTooltip(event, tooltipData);
+                })
+                .on('mouseout', hideTooltip);
+
+            // Create labels with different sizes
+            text = g.append('g')
+                .selectAll('text')
+                .data(nodes)
+                .join('text')
+                .text(d => {
+                    const name = d.data.name;
+                    if (d.depth === 1) {
+                        // Show company name with count
+                        const count = d.children ? d.children.length : 0;
+                        return `${name} (${count})`;
+                    }
+                    return name.length > 15 ? name.substring(0, 15) + '...' : name;
+                })
+                .attr('font-size', d => {
+                    if (d.depth === 0) return 16;  // You - largest text
+                    if (d.depth === 1) return 11;  // Company - medium text
+                    return 8;                       // Person - smallest text
+                })
+                .attr('font-weight', d => d.depth <= 1 ? 'bold' : 'normal')
+                .attr('dx', d => d.depth === 0 ? 0 : (d.depth === 1 ? 18 : 10))
+                .attr('dy', d => d.depth === 0 ? -30 : 4)
+                .attr('text-anchor', d => d.depth === 0 ? 'middle' : 'start')
+                .attr('fill', '#fff')
+                .style('pointer-events', 'none');
+            
+            simulation.on('tick', () => {
+                link
+                    .attr('x1', d => d.source.x)
+                    .attr('y1', d => d.source.y)
+                    .attr('x2', d => d.target.x)
+                    .attr('y2', d => d.target.y);
+
+                node
+                    .attr('cx', d => d.x)
+                    .attr('cy', d => d.y);
+
+                text
+                    .attr('x', d => d.x)
+                    .attr('y', d => d.y);
+            });
+
+            // Add click handler to SVG background to reset highlight
+            svg.on('click', () => {
+                resetHighlight();
+            });
+        }
+
+        // Track currently highlighted company
+        let highlightedCompany = null;
+
+        function handleCompanyHighlight(companyNode) {
+            const companyId = companyNode.data.id;
+
+            // Toggle: if clicking the same company, reset
+            if (highlightedCompany === companyId) {
+                resetHighlight();
+                return;
+            }
+
+            highlightedCompany = companyId;
+            const companyName = companyNode.data.company;
+
+            // Get IDs of all employees in this company
+            const employeeIds = new Set();
+            if (companyNode.children) {
+                companyNode.children.forEach(child => {
+                    employeeIds.add(child.data.id);
+                });
+            }
+
+            // Dim all nodes except: You, this company, and its employees
+            node.transition()
+                .duration(300)
+                .attr('opacity', d => {
+                    if (d.depth === 0) return 1;  // You - always visible
+                    if (d.depth === 1) {
+                        return d.data.id === companyId ? 1 : 0.1;  // Highlight company, dim others
+                    }
+                    // Person nodes - only show if they belong to this company
+                    return employeeIds.has(d.data.id) ? 0.8 : 0.05;
+                });
+
+            // Dim all text labels except for highlighted company and its employees
+            text.transition()
+                .duration(300)
+                .attr('opacity', d => {
+                    if (d.depth === 0) return 1;  // You - always visible
+                    if (d.depth === 1) {
+                        return d.data.id === companyId ? 1 : 0.1;
+                    }
+                    return employeeIds.has(d.data.id) ? 1 : 0.05;
+                });
+
+            // Dim links except those connected to highlighted company
+            link.transition()
+                .duration(300)
+                .attr('stroke-opacity', d => {
+                    // Highlight links from You to this company
+                    if (d.source.depth === 0 && d.target.data.id === companyId) return 0.6;
+                    // Highlight links from this company to its employees
+                    if (d.source.data.id === companyId) return 0.6;
+                    return 0.05;
+                });
+
+            // Highlight the same company in timeline chart
+            highlightCompanyInTimeline(companyName);
+        }
+
+        function resetHighlight() {
+            highlightedCompany = null;
+
+            // Restore all nodes to original opacity
+            node.transition()
+                .duration(300)
+                .attr('opacity', d => d.depth === 2 ? 0.8 : 1);
+
+            // Restore all text labels
+            text.transition()
+                .duration(300)
+                .attr('opacity', 1);
+
+            // Restore all links
+            link.transition()
+                .duration(300)
+                .attr('stroke-opacity', 0.4);
+
+            // Reset timeline highlight
+            resetTimelineHighlight();
+        }
+
+        // Timeline highlight functions
+        function highlightCompanyInTimeline(companyName) {
+            // Check if timeline bar groups exist (for stacked bar chart)
+            const timelineGroups = d3.select('#timelineChart').selectAll('g g');
+            if (timelineGroups.empty()) return;
+
+            // Fade all bar groups and make only selected company visible
+            timelineGroups.selectAll('rect').transition()
+                .duration(300)
+                .attr('opacity', function(d) {
+                    const parentData = d3.select(this.parentNode).datum();
+                    return parentData.key === companyName ? 0.9 : 0.1;
+                });
+        }
+
+        function resetTimelineHighlight() {
+            // Check if timeline bar groups exist
+            const timelineGroups = d3.select('#timelineChart').selectAll('g g');
+            if (timelineGroups.empty()) return;
+
+            // Restore all bars to original opacity
+            timelineGroups.selectAll('rect').transition()
+                .duration(300)
+                .attr('opacity', 0.7);
+        }
+
+        function buildTimelineChart(data) {
+            console.log('Building timeline chart with', data.length, 'connections');
+            console.log('Sample data:', data.slice(0, 3));
+
+            const width = document.getElementById('timelineChart').clientWidth;
+            const height = document.getElementById('timelineChart').clientHeight;
+            const margin = {top: 40, right: 120, bottom: 80, left: 60};
+            const innerWidth = width - margin.left - margin.right;
+            const innerHeight = height - margin.top - margin.bottom;
+
+            // Clear existing
+            d3.select('#timelineChart').selectAll('*').remove();
+
+            // Parse dates and group by month and company
+            const parseDate = d3.timeParse('%d %b %Y');
+            const dataByDate = new Map();
+            
+            let parsedCount = 0;
+            let skippedNoDate = 0;
+            let skippedParseError = 0;
+
+            data.forEach(d => {
+                if (!d.connectedOn) {
+                    skippedNoDate++;
+                    return;
+                }
+                const date = parseDate(d.connectedOn);
+                if (!date) {
+                    skippedParseError++;
+                    if (skippedParseError <= 3) {
+                        console.log('Failed to parse date:', d.connectedOn);
+                    }
+                    return;
+                }
+
+                parsedCount++;
+                const monthKey = d3.timeMonth.floor(date);
+                const company = d.company || 'Unknown';
+
+                // Find existing month by comparing timestamps
+                let existingMonth = null;
+                for (const [key, value] of dataByDate.entries()) {
+                    if (key.getTime() === monthKey.getTime()) {
+                        existingMonth = key;
+                        break;
+                    }
+                }
+
+                if (!existingMonth) {
+                    dataByDate.set(monthKey, new Map());
+                    existingMonth = monthKey;
+                }
+
+                const monthData = dataByDate.get(existingMonth);
+                monthData.set(company, (monthData.get(company) || 0) + 1);
+            });
+
+            console.log('Parsed dates count:', dataByDate.size);
+            console.log('Successfully parsed:', parsedCount, 'Skipped (no date):', skippedNoDate, 'Skipped (parse error):', skippedParseError);
+
+            // Get all months in range
+            const allDates = Array.from(dataByDate.keys()).sort((a, b) => a - b);
+            if (allDates.length === 0) {
+                d3.select('#timelineChart').append('text')
+                    .attr('x', width / 2)
+                    .attr('y', height / 2)
+                    .attr('text-anchor', 'middle')
+                    .attr('fill', '#fff')
+                    .text('No date information available');
+                return;
+            }
+
+            const minDate = allDates[0];
+            const maxDate = allDates[allDates.length - 1];
+
+            console.log('Date range:', minDate, 'to', maxDate);
+
+            // Create all months between min and max
+            const allMonths = d3.timeMonths(minDate, d3.timeMonth.offset(maxDate, 1));
+
+            // Get all unique companies from the actual parsed date data
+            // This ensures we only use companies that actually have connection dates
+            const companiesWithDates = Array.from(new Set(
+                Array.from(dataByDate.values()).flatMap(monthData => Array.from(monthData.keys()))
+            ));
+
+            // Use companies from the data that have dates, filtered by selectedCompanies if applicable
+            const companies = selectedCompanies.size > 0
+                ? companiesWithDates.filter(c => selectedCompanies.has(c))
+                : companiesWithDates;
+
+            console.log('Total months:', allMonths.length);
+            console.log('Selected companies size:', selectedCompanies.size);
+            console.log('Companies for timeline:', companies);
+            
+            // Build complete dataset with all months
+            const stackData = allMonths.map(date => {
+                const obj = { date };
+                // Find the matching month in dataByDate by comparing time values
+                let monthData = null;
+                for (const [key, value] of dataByDate.entries()) {
+                    if (key.getTime() === date.getTime()) {
+                        monthData = value;
+                        break;
+                    }
+                }
+                if (!monthData) monthData = new Map();
+
+                companies.forEach(company => {
+                    obj[company] = monthData.get(company) || 0;
+                });
+                return obj;
+            });
+
+            // Debug: Check if we have any non-zero values
+            const sampleWithData = stackData.find(d => {
+                return companies.some(company => d[company] > 0);
+            });
+            console.log('Sample month with data:', sampleWithData);
+            console.log('Companies in dataByDate:', Array.from(new Set(Array.from(dataByDate.values()).flatMap(m => Array.from(m.keys())))));
+            
+            // Create stack
+            const stack = d3.stack()
+                .keys(companies)
+                .order(d3.stackOrderNone)
+                .offset(d3.stackOffsetNone);
+
+            const series = stack(stackData);
+
+            console.log('Stack data sample:', stackData.slice(0, 3));
+            console.log('Series:', series.length, 'companies');
+            const maxValue = d3.max(series, d => d3.max(d, d => d[1]));
+            console.log('Max stack value:', maxValue);
+
+            // Create scales
+            // Use scaleBand for bars instead of scaleTime
+            const x = d3.scaleBand()
+                .domain(stackData.map(d => d.date))
+                .range([0, innerWidth])
+                .padding(0.1);
+
+            const y = d3.scaleLinear()
+                .domain([0, maxValue || 10])
+                .nice()
+                .range([innerHeight, 0]);
+            
+            // Create SVG
+            const svg = d3.select('#timelineChart')
+                .attr('width', width)
+                .attr('height', height);
+            
+            const g = svg.append('g')
+                .attr('transform', `translate(${margin.left},${margin.top})`);
+            
+            // Clip path
+            g.append('defs').append('clipPath')
+                .attr('id', 'clip-timeline')
+                .append('rect')
+                .attr('width', innerWidth)
+                .attr('height', innerHeight);
+
+            const chartArea = g.append('g')
+                .attr('clip-path', 'url(#clip-timeline)');
+
+            // Draw stacked bars
+            const barGroups = chartArea.selectAll('g')
+                .data(series)
+                .join('g')
+                .attr('fill', d => companyColors[d.key] || '#999');
+
+            const bars = barGroups.selectAll('rect')
+                .data(d => d)
+                .join('rect')
+                .attr('x', d => x(d.data.date))
+                .attr('y', d => y(d[1]))
+                .attr('height', d => y(d[0]) - y(d[1]))
+                .attr('width', x.bandwidth())
+                .attr('opacity', 0.7)
+                .style('cursor', 'pointer')
+                .on('mouseover', function(event, d) {
+                    // Show tooltip with company and count
+                    const companyKey = d3.select(this.parentNode).datum().key;
+                    const count = d[1] - d[0];
+                    if (count > 0) {
+                        d3.select(this).attr('opacity', 0.9);
+                    }
+                })
+                .on('mouseout', function(event, d) {
+                    d3.select(this).attr('opacity', 0.7);
+                });
+
+            console.log('Bar groups created:', barGroups.size());
+            console.log('Total bars created:', bars.size());
+
+            // Debug: Check a sample bar's attributes
+            const sampleBar = bars.nodes()[0];
+            if (sampleBar) {
+                console.log('Sample bar attributes:', {
+                    x: sampleBar.getAttribute('x'),
+                    y: sampleBar.getAttribute('y'),
+                    width: sampleBar.getAttribute('width'),
+                    height: sampleBar.getAttribute('height')
+                });
+            }
+            
+            // Add grid lines (skip for bar chart to reduce clutter)
+            // Grid doesn't work well with band scale, so we'll only show y-axis grid
+            
+            const yAxisGrid = g.append('g')
+                .attr('class', 'grid')
+                .call(d3.axisLeft(y)
+                    .ticks(5)
+                    .tickSize(-innerWidth)
+                    .tickFormat(''));
+            
+            yAxisGrid.selectAll('line')
+                .attr('stroke', '#444')
+                .attr('stroke-opacity', 0.3);
+            
+            // Add axes
+            const xAxis = g.append('g')
+                .attr('class', 'x-axis')
+                .attr('transform', `translate(0,${innerHeight})`);
+            
+            const yAxis = g.append('g')
+                .attr('class', 'y-axis');
+            
+            updateAxes();
+            
+            // Tooltip
+            const tooltip = d3.select('body').append('div')
+                .attr('class', 'timeline-tooltip')
+                .style('position', 'absolute')
+                .style('background', 'rgba(0, 0, 0, 0.9)')
+                .style('color', 'white')
+                .style('padding', '10px')
+                .style('border-radius', '5px')
+                .style('font-size', '12px')
+                .style('pointer-events', 'none')
+                .style('opacity', 0)
+                .style('z-index', 10000);
+            
+            // Define zoom behavior
+            const zoom = d3.zoom()
+                .scaleExtent([1, 20])
+                .translateExtent([[0, 0], [innerWidth, innerHeight]])
+                .filter((event) => {
+                    if (event.type === 'wheel') {
+                        event.preventDefault();
+                        return true;
+                    }
+                    return !event.ctrlKey && !event.button;
+                })
+                .on('zoom', zoomed);
+
+            // Hover overlay for tooltips and zoom
+            const overlay = g.append('rect')
+                .attr('width', innerWidth)
+                .attr('height', innerHeight)
+                .attr('fill', 'none')
+                .style('pointer-events', 'all')
+                .call(zoom)
+                .on('mousemove.tooltip', handleMouseMove)
+                .on('mouseout.tooltip', handleMouseOut);
+
+            function handleMouseMove(event) {
+                const [mouseX] = d3.pointer(event);
+
+                // Find which bar we're hovering over using band scale
+                const eachBand = x.step();
+                const index = Math.floor(mouseX / eachBand);
+                const dataPoint = stackData[index];
+                
+                if (dataPoint && dataPoint.date) {
+                    // Build tooltip content
+                    const monthYear = d3.timeFormat('%B %Y')(dataPoint.date);
+                    let tooltipContent = `<strong>${monthYear}</strong><br/>`;
+
+                    companies.forEach(company => {
+                        const count = dataPoint[company] || 0;
+                        if (count > 0) {
+                            const color = companyColors[company] || '#999';
+                            tooltipContent += `<div style="margin-top: 5px;">
+                                <span style="display: inline-block; width: 10px; height: 10px; background: ${color}; margin-right: 5px;"></span>
+                                ${company}: <strong>${count}</strong>
+                            </div>`;
+                        }
+                    });
+
+                    tooltip
+                        .html(tooltipContent)
+                        .style('left', (event.pageX + 15) + 'px')
+                        .style('top', (event.pageY - 15) + 'px')
+                        .style('opacity', 1);
+                } else {
+                    handleMouseOut();
+                }
+            }
+
+            function handleMouseOut() {
+                tooltip.style('opacity', 0);
+            }
+
+            function zoomed(event) {
+                // For band scale, we manually apply the transform
+                const transform = event.transform;
+
+                // Update bars with transform
+                barGroups.selectAll('rect')
+                    .attr('x', d => transform.applyX(x(d.data.date)))
+                    .attr('width', x.bandwidth() * transform.k);
+
+                // Create axis scale by manually applying transform to band positions
+                const transformedScale = (date) => transform.applyX(x(date));
+                transformedScale.bandwidth = () => x.bandwidth() * transform.k;
+
+                // Calculate visible range
+                const [x0, x1] = [
+                    transform.invertX(0),
+                    transform.invertX(innerWidth)
+                ];
+
+                // Find visible data based on pixel positions
+                const visibleData = stackData.filter(d => {
+                    const pos = x(d.date) + x.bandwidth() / 2;
+                    return pos >= x0 && pos <= x1;
+                });
+
+                // Determine tick frequency based on visible range
+                let tickValues;
+                const visibleMonths = visibleData.length;
+
+                if (visibleMonths > 120) {
+                    tickValues = visibleData.filter((d, i) => i % 12 === 0).map(d => d.date);
+                } else if (visibleMonths > 60) {
+                    tickValues = visibleData.filter((d, i) => i % 6 === 0).map(d => d.date);
+                } else if (visibleMonths > 24) {
+                    tickValues = visibleData.filter((d, i) => i % 3 === 0).map(d => d.date);
+                } else if (visibleMonths > 12) {
+                    tickValues = visibleData.filter((d, i) => i % 2 === 0).map(d => d.date);
+                } else {
+                    tickValues = visibleData.map(d => d.date);
+                }
+
+                // Update axis with transformed positions
+                xAxis.call(g => {
+                    g.selectAll('.tick').remove();
+
+                    tickValues.forEach(date => {
+                        const tick = g.append('g')
+                            .attr('class', 'tick')
+                            .attr('transform', `translate(${transformedScale(date) + transformedScale.bandwidth() / 2}, 0)`);
+
+                        tick.append('line')
+                            .attr('stroke', '#999')
+                            .attr('y2', 6);
+
+                        tick.append('text')
+                            .attr('fill', '#fff')
+                            .attr('y', 9)
+                            .attr('dy', '0.71em')
+                            .attr('transform', 'rotate(-45)')
+                            .style('text-anchor', 'end')
+                            .text(d3.timeFormat('%b %Y')(date));
+                    });
+                });
+            }
+
+            function updateAxes() {
+                // For bar chart, show limited ticks based on data range
+                const totalMonths = stackData.length;
+
+                // Determine tick frequency based on total months
+                let tickValues;
+                if (totalMonths > 120) {
+                    // Show every 12th month (yearly)
+                    tickValues = stackData.filter((d, i) => i % 12 === 0).map(d => d.date);
+                } else if (totalMonths > 60) {
+                    // Show every 6th month
+                    tickValues = stackData.filter((d, i) => i % 6 === 0).map(d => d.date);
+                } else if (totalMonths > 24) {
+                    // Show every 3rd month (quarterly)
+                    tickValues = stackData.filter((d, i) => i % 3 === 0).map(d => d.date);
+                } else {
+                    // Show all months
+                    tickValues = stackData.map(d => d.date);
+                }
+
+                xAxis.call(d3.axisBottom(x)
+                    .tickValues(tickValues)
+                    .tickFormat(d3.timeFormat('%b %Y')));
+
+                xAxis.selectAll('text')
+                    .attr('fill', '#fff')
+                    .attr('transform', 'rotate(-45)')
+                    .style('text-anchor', 'end');
+
+                yAxis.call(d3.axisLeft(y).ticks(5));
+
+                xAxis.selectAll('.domain, .tick line').attr('stroke', '#999');
+                yAxis.selectAll('text').attr('fill', '#fff');
+                yAxis.selectAll('.domain, .tick line').attr('stroke', '#999');
+            }
+
+            // Add title
+            svg.append('text')
+                .attr('x', width / 2)
+                .attr('y', 20)
+                .attr('text-anchor', 'middle')
+                .attr('font-size', 18)
+                .attr('font-weight', 'bold')
+                .attr('fill', '#fff')
+                .text('Connections Over Time by Company');
+
+            // Add zoom instructions
+            svg.append('text')
+                .attr('x', width / 2)
+                .attr('y', height - 5)
+                .attr('text-anchor', 'middle')
+                .attr('font-size', 11)
+                .attr('fill', '#aaa')
+                .text('Scroll to zoom • Double-click to reset');
+
+            // Add legend
+            const legend = svg.append('g')
+                .attr('transform', `translate(${width - margin.right + 10}, ${margin.top})`);
+            
+            companies.forEach((company, i) => {
+                const legendRow = legend.append('g')
+                    .attr('transform', `translate(0, ${i * 20})`);
+                
+                legendRow.append('rect')
+                    .attr('width', 15)
+                    .attr('height', 15)
+                    .attr('fill', companyColors[company]);
+                
+                legendRow.append('text')
+                    .attr('x', 20)
+                    .attr('y', 12)
+                    .attr('font-size', 11)
+                    .attr('fill', '#fff')
+                    .text(company.length > 15 ? company.substring(0, 15) + '...' : company);
+            });
+        }
+        
+        function buildBubbleChart(data) {
+            console.log('Building bubble chart');
+            
+            const width = document.getElementById('bubbleChart').clientWidth;
+            const height = document.getElementById('bubbleChart').clientHeight;
+            const margin = {top: 60, right: 20, bottom: 20, left: 20};
+            
+            // Clear existing
+            d3.select('#bubbleChart').selectAll('*').remove();
+            
+            // Group by company
+            const companyData = d3.rollup(
+                data,
+                v => v.length,
+                d => d.company || 'Unknown'
+            );
+            
+            // Create hierarchy
+            const root = d3.hierarchy({ children: Array.from(companyData, ([name, value]) => ({ name, value })) })
+                .sum(d => d.value)
+                .sort((a, b) => b.value - a.value);
+            
+            // Create pack layout
+            const pack = d3.pack()
+                .size([width - margin.left - margin.right, height - margin.top - margin.bottom])
+                .padding(5);
+            
+            pack(root);
+            
+            // Create SVG
+            const svg = d3.select('#bubbleChart')
+                .attr('width', width)
+                .attr('height', height);
+            
+            // Add zoom
+            const zoom = d3.zoom()
+                .scaleExtent([0.5, 8])
+                .on('zoom', zoomed);
+            
+            svg.call(zoom);
+            
+            const g = svg.append('g')
+                .attr('transform', `translate(${margin.left}, ${margin.top})`);
+            
+            // Tooltip
+            const tooltip = d3.select('body').append('div')
+                .attr('class', 'bubble-tooltip')
+                .style('position', 'absolute')
+                .style('background', 'rgba(0, 0, 0, 0.9)')
+                .style('color', 'white')
+                .style('padding', '10px')
+                .style('border-radius', '5px')
+                .style('font-size', '12px')
+                .style('pointer-events', 'none')
+                .style('opacity', 0)
+                .style('z-index', 10000);
+            
+            // Create bubbles
+            const bubbles = g.selectAll('g')
+                .data(root.children)
+                .join('g')
+                .attr('transform', d => `translate(${d.x},${d.y})`)
+                .style('cursor', 'pointer');
+            
+            bubbles.append('circle')
+                .attr('r', d => d.r)
+                .attr('fill', d => companyColors[d.data.name] || '#28a745')
+                .attr('opacity', 0.7)
+                .attr('stroke', '#fff')
+                .attr('stroke-width', 2)
+                .on('mouseover', function(event, d) {
+                    d3.select(this)
+                        .transition()
+                        .duration(200)
+                        .attr('opacity', 1)
+                        .attr('stroke-width', 4);
+                    
+                    tooltip
+                        .html(`
+                            <strong>${d.data.name}</strong><br/>
+                            <span style="color: ${companyColors[d.data.name]};">●</span> ${d.value} connections<br/>
+                            <span style="font-size: 10px; color: #aaa;">Click to filter</span>
+                        `)
+                        .style('left', (event.pageX + 15) + 'px')
+                        .style('top', (event.pageY - 15) + 'px')
+                        .style('opacity', 1);
+                })
+                .on('mouseout', function() {
+                    d3.select(this)
+                        .transition()
+                        .duration(200)
+                        .attr('opacity', 0.7)
+                        .attr('stroke-width', 2);
+                    
+                    tooltip.style('opacity', 0);
+                })
+                .on('click', function(event, d) {
+                    // Toggle company selection
+                    const company = d.data.name;
+                    const checkbox = document.getElementById(`company_${company}`);
+                    if (checkbox) {
+                        checkbox.checked = !checkbox.checked;
+                        handleCompanyCheckbox(company, checkbox.checked);
+                    }
+                });
+            
+            // Add text labels
+            bubbles.each(function(d) {
+                const bubble = d3.select(this);
+                const textSize = Math.min(d.r / 3, 16);
+                
+                // Company name
+                bubble.append('text')
+                    .attr('text-anchor', 'middle')
+                    .attr('dy', '-0.3em')
+                    .attr('font-size', textSize)
+                    .attr('fill', '#fff')
+                    .attr('font-weight', 'bold')
+                    .style('pointer-events', 'none')
+                    .text(d.data.name.length > 12 ? d.data.name.substring(0, 12) + '...' : d.data.name);
+                
+                // Connection count (only if bubble is large enough)
+                if (d.r > 30) {
+                    bubble.append('text')
+                        .attr('text-anchor', 'middle')
+                        .attr('dy', '1em')
+                        .attr('font-size', Math.min(d.r / 4, 14))
+                        .attr('fill', '#fff')
+                        .style('pointer-events', 'none')
+                        .text(d.value + ' connections');
+                }
+            });
+            
+            function zoomed(event) {
+                g.attr('transform', `translate(${margin.left + event.transform.x}, ${margin.top + event.transform.y}) scale(${event.transform.k})`);
+            }
+            
+            // Add title
+            svg.append('text')
+                .attr('x', width / 2)
+                .attr('y', 30)
+                .attr('text-anchor', 'middle')
+                .attr('font-size', 18)
+                .attr('font-weight', 'bold')
+                .attr('fill', '#fff')
+                .text('Connections by Company (Zoom with scroll)');
+            
+            // Add instructions
+            svg.append('text')
+                .attr('x', width / 2)
+                .attr('y', 50)
+                .attr('text-anchor', 'middle')
+                .attr('font-size', 12)
+                .attr('fill', '#aaa')
+                .text('Scroll to zoom • Click bubble to filter');
+        }
+        
+        function drag(simulation) {
+            function dragstarted(event) {
+                if (!event.active) simulation.alphaTarget(0.3).restart();
+                event.subject.fx = event.subject.x;
+                event.subject.fy = event.subject.y;
+            }
+            
+            function dragged(event) {
+                event.subject.fx = event.x;
+                event.subject.fy = event.y;
+            }
+            
+            function dragended(event) {
+                if (!event.active) simulation.alphaTarget(0);
+                event.subject.fx = null;
+                event.subject.fy = null;
+            }
+            
+            return d3.drag()
+                .on('start', dragstarted)
+                .on('drag', dragged)
+                .on('end', dragended);
+        }
+        
+        function handleNodeClick(nodeData) {
+            selectedNode = nodeData;
+            
+            // Update node colors
+            node.attr('fill', d => {
+                if (d.id === nodeData.id) return '#ffc107';
+                if (d.type === 'central') return '#0077b5';
+                const company = d.data?.company || 'Unknown';
+                return companyColors[company] || '#28a745';
+            });
+            
+            // Show sidebar
+            document.getElementById('sidebar').classList.add('active');
+            
+            if (nodeData.type === 'central') {
+                document.getElementById('nodeInfo').innerHTML = `
+                    <div class="node-info">
+                        <div class="info-item">
+                            <div class="info-label">Name</div>
+                            <div class="info-value">You (Central Node)</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Total Connections</div>
+                            <div class="info-value">${allData.length}</div>
+                        </div>
+                    </div>
+                `;
+            } else {
+                const data = nodeData.data;
+                document.getElementById('nodeInfo').innerHTML = `
+                    <div class="node-info">
+                        <div class="info-item">
+                            <div class="info-label">Name</div>
+                            <div class="info-value">${data.fullName}</div>
+                        </div>
+                        ${data.company ? `
+                        <div class="info-item">
+                            <div class="info-label">Company</div>
+                            <div class="info-value">${data.company}</div>
+                        </div>
+                        ` : ''}
+                        ${data.position ? `
+                        <div class="info-item">
+                            <div class="info-label">Position</div>
+                            <div class="info-value">${data.position}</div>
+                        </div>
+                        ` : ''}
+                        ${data.email ? `
+                        <div class="info-item">
+                            <div class="info-label">Email</div>
+                            <div class="info-value">${data.email}</div>
+                        </div>
+                        ` : ''}
+                        ${data.url ? `
+                        <div class="info-item">
+                            <div class="info-label">LinkedIn Profile</div>
+                            <div class="info-value">
+                                <a href="${data.url}" target="_blank" style="color: #0077b5; text-decoration: none;">
+                                    View Profile
+                                </a>
+                            </div>
+                        </div>
+                        ` : ''}
+                        ${data.connectedOn ? `
+                        <div class="info-item">
+                            <div class="info-label">Connected On</div>
+                            <div class="info-value">${data.connectedOn}</div>
+                        </div>
+                        ` : ''}
+                    </div>
+                `;
+            }
+        }
+        
+        function showTooltip(event, d) {
+            const tooltip = document.getElementById('tooltip');
+            tooltip.style.display = 'block';
+            tooltip.style.left = (event.pageX + 10) + 'px';
+            tooltip.style.top = (event.pageY - 10) + 'px';
+            tooltip.textContent = d.name;
+        }
+        
+        function hideTooltip() {
+            document.getElementById('tooltip').style.display = 'none';
+        }
+        
+        function handleSearch() {
+            const query = document.getElementById('searchBox').value.toLowerCase().trim();
+            applyFilters();
+        }
+        
+        function applyFilters() {
+            console.log('=== APPLY FILTERS CALLED ===');
+            const searchQuery = document.getElementById('searchBox').value.toLowerCase().trim();
+            const companyFilter = document.getElementById('filterCompany').value.toLowerCase().trim();
+            const positionFilter = document.getElementById('filterPosition').value.toLowerCase().trim();
+            const dateFilter = document.getElementById('filterDate').value.toLowerCase().trim();
+            
+            console.log('Filters:', { searchQuery, companyFilter, positionFilter, dateFilter });
+            
+            filteredData = allData.filter(d => {
+                const matchSearch = !searchQuery || 
+                    d.fullName.toLowerCase().includes(searchQuery) ||
+                    d.company.toLowerCase().includes(searchQuery) ||
+                    d.position.toLowerCase().includes(searchQuery) ||
+                    d.email.toLowerCase().includes(searchQuery);
+                
+                const matchCompany = !companyFilter || d.company.toLowerCase().includes(companyFilter);
+                const matchPosition = !positionFilter || d.position.toLowerCase().includes(positionFilter);
+                const matchDate = !dateFilter || d.connectedOn.toLowerCase().includes(dateFilter);
+                
+                return matchSearch && matchCompany && matchPosition && matchDate;
+            });
+            
+            if (allData.length > 0) {
+                currentBatch = 1;
+                displayedData = filteredData.slice(0, Math.min(BATCH_SIZE, filteredData.length));
+                console.log(`After filter: displaying ${displayedData.length} of ${filteredData.length}`);
+                buildGraph(displayedData);
+                updateStats();
+                updateLoadMoreButton();
+            }
+        }
+        
+        function resetView() {
+            document.getElementById('searchBox').value = '';
+            document.getElementById('filterCompany').value = '';
+            document.getElementById('filterPosition').value = '';
+            document.getElementById('filterDate').value = '';
+            filteredData = [...allData];
+            currentBatch = 0;
+            if (allData.length > 0) {
+                displayedData = filteredData.slice(0, Math.min(BATCH_SIZE, filteredData.length));
+                buildGraph(displayedData);
+                updateStats();
+                updateLoadMoreButton();
+            }
+            selectedNode = null;
+        }
+        
+        function updateLoadMoreButton() {
+            const loadMoreBtn = document.getElementById('loadMoreBtn');
+            const remaining = filteredData.length - displayedData.length;
+            
+            // Only show load more button in graph view
+            if (currentViz !== 'graph') {
+                loadMoreBtn.style.display = 'none';
+                return;
+            }
+            
+            if (remaining > 0) {
+                loadMoreBtn.style.display = 'inline-block';
+                loadMoreBtn.textContent = `➕ Load More (${Math.min(BATCH_SIZE, remaining)})`;
+            } else {
+                loadMoreBtn.style.display = 'none';
+            }
+        }
+        
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('active');
+        }
+        
+        function exportGraph() {
+            const exportData = {
+                connections: allData,
+                stats: {
+                    total: allData.length,
+                    filtered: filteredData.length
+                },
+                exportDate: new Date().toISOString()
+            };
+            
+            const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'linkedin_connections_export.json';
+            a.click();
+            URL.revokeObjectURL(url);
+            
+            showNotification('Graph exported successfully!', 'success');
+        }
+        
+        function updateStats() {
+            document.getElementById('stats').style.display = 'flex';
+            document.getElementById('totalConnections').textContent = filteredData.length;
+            document.getElementById('displayedConnections').textContent = displayedData.length;
+            
+            // Update header count
+            const countEl = document.getElementById('connectionCount');
+            countEl.style.display = 'inline-block';
+            
+            if (currentViz === 'graph') {
+                countEl.textContent = `${displayedData.length} / ${filteredData.length} connections`;
+            } else {
+                countEl.textContent = `${filteredData.length} connections (all)`;
+            }
+            
+            updateLoadMoreButton();
+        }
+        
+        function showLoading(show) {
+            const loading = document.getElementById('loading');
+            if (show) {
+                loading.classList.remove('hidden');
+                document.getElementById('loadingText').textContent = 'Loading connections...';
+            } else {
+                loading.classList.add('hidden');
+            }
+        }
+        
+        function showNotification(message, type = 'success') {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.className = `notification ${type} show`;
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+        
+        // Handle window resize
+        let resizeTimeout;
+        window.addEventListener('resize', () => {
+            console.log('=== WINDOW RESIZE TRIGGERED ===');
+            if (allData.length > 0) {
+                // Debounce resize to avoid multiple calls
+                clearTimeout(resizeTimeout);
+                resizeTimeout = setTimeout(() => {
+                    console.log('Rebuilding graph after resize with displayedData:', displayedData.length);
+                    buildGraph(displayedData);
+                }, 250);
+            }
+        });
+    </script>
 </body>
 </html>
