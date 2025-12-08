@@ -10,7 +10,11 @@
     
     <!-- D3.js for graph visualization -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
-    
+
+    <!-- AnyChart for timeline visualization -->
+    <script src="https://cdn.anychart.com/releases/v8/js/anychart-base.min.js"></script>
+    <script src="https://cdn.anychart.com/releases/v8/js/anychart-timeline.min.js"></script>
+
     <style>
         * {
             margin: 0;
@@ -449,7 +453,6 @@
             <div class="controls">
                 <input type="file" id="csvFile" accept=".csv" style="display: none;">
                 <button class="btn" onclick="loadCSV()">📁 Load CSV</button>
-                <button class="btn btn-success" onclick="loadNextBatch()" id="loadMoreBtn" style="display: none;">➕ Load More (100)</button>
                 <span id="connectionCount" style="background: white; padding: 8px 15px; border-radius: 20px; font-weight: 600; color: #0077b5; display: none;">0 connections</span>
                 <input type="text" id="searchBox" class="search-box" placeholder="🔍 Search connections..." oninput="handleSearch()">
                 <button class="btn btn-secondary" onclick="resetView()">🔄 Reset View</button>
@@ -463,22 +466,88 @@
                 <button class="viz-tab active" onclick="switchViz('graph')">🔗 Network Graph</button>
                 <button class="viz-tab" onclick="switchViz('timeline')">📊 Timeline</button>
                 <button class="viz-tab" onclick="switchViz('bubble')">⚪ Bubble Chart</button>
+                <button class="viz-tab" onclick="switchViz('calendar')">📅 Calendar</button>
+                <button class="viz-tab" onclick="switchViz('career')">💼 Career Timeline</button>
             </div>
             <div class="viz-content">
                 <div class="viz-panel active" id="graphPanel">
                     <div class="graph-container">
+                        <div id="graphControls" style="text-align: center; padding: 20px;">
+                            <button class="btn" onclick="changeGraphYear(-1)">← Previous Year</button>
+                            <span id="graphYear" style="font-size: 20px; font-weight: bold; margin: 0 20px; color: white;">All Years</span>
+                            <button class="btn" onclick="changeGraphYear(1)">Next Year →</button>
+                            <button class="btn btn-secondary" onclick="resetGraphYear()" style="margin-left: 20px;">Show All Years</button>
+                        </div>
+                        <div style="text-align: center; padding: 10px 20px; display: flex; justify-content: center; align-items: center; gap: 20px;">
+                            <div>
+                                <label for="minCompanySizeSelect" style="color: white; font-size: 13px; margin-right: 8px;">
+                                    Min connections per company:
+                                </label>
+                                <select id="minCompanySizeSelect" onchange="updateMinCompanySize(this.value)"
+                                        style="padding: 5px 10px; border-radius: 5px; border: 1px solid #ddd; font-size: 13px; cursor: pointer;">
+                                    <option value="1">1+</option>
+                                    <option value="2">2+</option>
+                                    <option value="3">3+</option>
+                                    <option value="5" selected>5+</option>
+                                    <option value="10">10+</option>
+                                    <option value="15">15+</option>
+                                    <option value="20">20+</option>
+                                    <option value="30">30+</option>
+                                    <option value="50">50+</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label style="color: white; font-size: 13px; cursor: pointer; display: flex; align-items: center; gap: 5px;">
+                                    <input type="checkbox" id="showMembersCheckbox" onchange="toggleShowMembers(this.checked)" checked
+                                           style="cursor: pointer; width: 16px; height: 16px;">
+                                    Show individual connections
+                                </label>
+                            </div>
+                        </div>
                         <svg id="graph"></svg>
                         <div class="tooltip" id="tooltip"></div>
                     </div>
                 </div>
                 <div class="viz-panel" id="timelinePanel">
                     <div class="graph-container">
+                        <div id="timelineControls" style="text-align: center; padding: 20px;">
+                            <button class="btn" onclick="changeTimelineYear(-1)">← Previous Year</button>
+                            <span id="timelineYear" style="font-size: 20px; font-weight: bold; margin: 0 20px; color: white;">All Years</span>
+                            <button class="btn" onclick="changeTimelineYear(1)">Next Year →</button>
+                            <button class="btn btn-secondary" onclick="resetTimelineYear()" style="margin-left: 20px;">Show All Years</button>
+                        </div>
                         <svg id="timelineChart"></svg>
                     </div>
                 </div>
                 <div class="viz-panel" id="bubblePanel">
                     <div class="graph-container">
+                        <div id="bubbleControls" style="text-align: center; padding: 20px;">
+                            <button class="btn" onclick="changeBubbleYear(-1)">← Previous Year</button>
+                            <span id="bubbleYear" style="font-size: 20px; font-weight: bold; margin: 0 20px; color: white;">All Years</span>
+                            <button class="btn" onclick="changeBubbleYear(1)">Next Year →</button>
+                            <button class="btn btn-secondary" onclick="resetBubbleYear()" style="margin-left: 20px;">Show All Years</button>
+                        </div>
                         <svg id="bubbleChart"></svg>
+                    </div>
+                </div>
+                <div class="viz-panel" id="calendarPanel">
+                    <div class="graph-container">
+                        <div id="calendarControls" style="text-align: center; padding: 20px;">
+                            <button class="btn" onclick="changeCalendarYear(-1)">← Previous Year</button>
+                            <span id="calendarYear" style="font-size: 20px; font-weight: bold; margin: 0 20px; color: white;">2024</span>
+                            <button class="btn" onclick="changeCalendarYear(1)">Next Year →</button>
+                        </div>
+                        <svg id="calendarChart"></svg>
+                    </div>
+                </div>
+                <div class="viz-panel" id="careerPanel">
+                    <div class="graph-container">
+                        <div id="careerControls" style="text-align: center; padding: 20px;">
+                            <input type="file" id="careerCsvFile" accept=".csv" style="display: none;">
+                            <button class="btn" onclick="loadCareerCSV()">📁 Load Career CSV</button>
+                            <span id="careerStatus" style="background: white; padding: 8px 15px; border-radius: 20px; font-weight: 600; color: #0077b5; margin-left: 15px; display: none;"></span>
+                        </div>
+                        <div id="careerTimeline" style="width: 100%; height: calc(100vh - 250px);"></div>
                     </div>
                 </div>
                 <div class="sidebar" id="sidebar">
@@ -541,60 +610,61 @@
     <script>
         let allData = [];
         let filteredData = [];
-        let displayedData = [];
         let simulation;
         let svg, g, link, node, text;
         let selectedNode = null;
-        let currentBatch = 0;
-        const BATCH_SIZE = 100;
         let isLoading = false;
         let selectedCompanies = new Set();
         let companyColors = {};
         let clusteringEnabled = false;
         let currentViz = 'graph';
+        const currentYear = new Date().getFullYear();
+        let currentCalendarYear = currentYear;
+        let currentTimelineYear = currentYear; // Default to current year for faster loading
+        let currentGraphYear = currentYear; // Default to current year for faster loading
+        let currentBubbleYear = currentYear; // Default to current year for faster loading
+        let minCompanySize = 5; // Minimum number of connections per company to display
+        let showMembers = true; // Show individual connections (default: true)
+        let expandedCompanies = new Set(); // Track which companies are expanded when showMembers is false
         
         // Initialize
         document.getElementById('csvFile').addEventListener('change', handleFileSelect);
         
         function switchViz(vizType) {
             currentViz = vizType;
-            
+
             // Update tabs
             document.querySelectorAll('.viz-tab').forEach(tab => tab.classList.remove('active'));
             event.target.classList.add('active');
-            
+
             // Update panels
             document.querySelectorAll('.viz-panel').forEach(panel => panel.classList.remove('active'));
-            
-            // Show/hide Load More button based on viz type
-            const loadMoreBtn = document.getElementById('loadMoreBtn');
-            
+
             if (vizType === 'graph') {
                 document.getElementById('graphPanel').classList.add('active');
-                // Show load more only if there's more data
-                if (displayedData.length < filteredData.length) {
-                    loadMoreBtn.style.display = 'inline-block';
-                }
+                applyYearFilterAndRebuild();
             } else if (vizType === 'timeline') {
                 document.getElementById('timelinePanel').classList.add('active');
-                loadMoreBtn.style.display = 'none'; // Hide load more
-                // Use ALL filtered data for timeline
-                buildTimelineChart(filteredData);
+                buildTimelineChart(filteredData, currentTimelineYear);
             } else if (vizType === 'bubble') {
                 document.getElementById('bubblePanel').classList.add('active');
-                loadMoreBtn.style.display = 'none'; // Hide load more
-                // Use ALL filtered data for bubble chart
-                buildBubbleChart(filteredData);
+                buildBubbleChart(filteredData, currentBubbleYear);
+            } else if (vizType === 'calendar') {
+                document.getElementById('calendarPanel').classList.add('active');
+                buildCalendarChart(filteredData, currentCalendarYear);
+            } else if (vizType === 'career') {
+                document.getElementById('careerPanel').classList.add('active');
+                // Career timeline is loaded separately with its own CSV
             }
         }
         
         function toggleClustering(enabled) {
             clusteringEnabled = enabled;
             console.log('Clustering toggled:', enabled);
-            
+
             // Rebuild graph with clustering
-            if (displayedData.length > 0) {
-                buildGraph(displayedData);
+            if (filteredData.length > 0) {
+                applyYearFilterAndRebuild();
             }
             
             if (enabled) {
@@ -709,28 +779,20 @@
         function applyCompanyFilter() {
             console.log('=== APPLYING COMPANY FILTER ===');
             console.log('Selected companies:', Array.from(selectedCompanies));
-            
+
             // Filter data based on selected companies
             filteredData = allData.filter(conn => {
                 const company = conn.company || 'Unknown';
                 return selectedCompanies.has(company);
             });
-            
+
             console.log(`Filtered to ${filteredData.length} connections`);
-            
-            // Reset to first batch
-            currentBatch = 1;
-            displayedData = filteredData.slice(0, Math.min(BATCH_SIZE, filteredData.length));
-            
-            // Rebuild graph
-            buildGraph(displayedData);
-            updateStats();
-            updateLoadMoreButton();
-            
-            // Update aggregate visualizations with ALL filtered data
-            buildTimelineChart(filteredData);
-            buildBubbleChart(filteredData);
-            
+
+            // Rebuild all visualizations with year filters applied
+            applyYearFilterAndRebuild();
+            buildTimelineChart(filteredData, currentTimelineYear);
+            buildBubbleChart(filteredData, currentBubbleYear);
+
             showNotification(`Showing ${filteredData.length} connections from ${selectedCompanies.size} companies`, 'success');
         }
         
@@ -804,27 +866,32 @@
                     }
                     
                     filteredData = [...allData];
-                    currentBatch = 0;
-                    
-                    // Initialize displayedData with only first batch
-                    displayedData = filteredData.slice(0, Math.min(BATCH_SIZE, filteredData.length));
-                    
-                    console.log(`Initial load: displaying ${displayedData.length} of ${filteredData.length} total connections`);
-                    
-                    // Build company filter list
-                    buildCompanyFilter();
-                    
-                    // Build graph with only the first batch
-                    buildGraph(displayedData);
-                    currentBatch = 1; // Set to 1 since we've loaded the first batch
-                    
-                    showLoading(false);
-                    showNotification(`Loaded ${displayedData.length} of ${allData.length} connections. Click "Load More" to see more!`, 'success');
-                    updateStats();
-                    
-                    // Build aggregate visualizations with ALL data
-                    buildTimelineChart(filteredData);
-                    buildBubbleChart(filteredData);
+
+                    console.log(`Loaded ${filteredData.length} total connections`);
+
+                    try {
+                        // Build company filter list
+                        buildCompanyFilter();
+
+                        // Update year display labels
+                        document.getElementById('graphYear').textContent = currentGraphYear;
+                        document.getElementById('timelineYear').textContent = currentTimelineYear;
+                        document.getElementById('bubbleYear').textContent = currentBubbleYear;
+
+                        // Build all visualizations with current year by default
+                        applyYearFilterAndRebuild();
+                        buildTimelineChart(filteredData, currentTimelineYear);
+                        buildBubbleChart(filteredData, currentBubbleYear);
+
+                        showNotification(`Loaded ${allData.length} connections. Showing ${currentYear} by default.`, 'success');
+                        updateStats();
+                    } catch (error) {
+                        console.error('Error building visualizations:', error);
+                        showNotification('Error building visualizations: ' + error.message, 'error');
+                    } finally {
+                        // Always hide loading indicator
+                        showLoading(false);
+                    }
                 },
                 error: function(error) {
                     showLoading(false);
@@ -832,41 +899,6 @@
                     console.error('Parse error:', error);
                 }
             });
-        }
-        
-        function loadNextBatch() {
-            if (isLoading) return;
-            
-            const start = currentBatch * BATCH_SIZE;
-            const end = Math.min(start + BATCH_SIZE, filteredData.length);
-            
-            if (start >= filteredData.length) {
-                return; // All data loaded
-            }
-            
-            isLoading = true;
-            
-            // Only get the data up to the current end point
-            displayedData = filteredData.slice(0, end);
-            
-            console.log(`Loading batch ${currentBatch + 1}: showing ${displayedData.length} of ${filteredData.length} total`);
-            
-            // Rebuild graph with current displayed data (only for graph view)
-            if (currentViz === 'graph') {
-                buildGraph(displayedData);
-            }
-            
-            currentBatch++;
-            isLoading = false;
-            
-            updateStats();
-            updateLoadMoreButton();
-            
-            if (end < filteredData.length) {
-                showNotification(`Showing ${end} of ${filteredData.length} connections. Click "Load More" to see more!`, 'success');
-            } else {
-                showNotification(`All ${filteredData.length} connections loaded!`, 'success');
-            }
         }
         
         function buildGraph(data) {
@@ -910,24 +942,31 @@
                 companiesMap.get(company).push(d);
             });
 
-            // Create hierarchical structure: You -> Companies -> People
+            // Create hierarchical structure: You -> Companies -> People (or just You -> Companies if showMembers is false)
             const root = {
                 id: 'central',
                 name: 'You',
                 type: 'central',
-                children: Array.from(companiesMap.entries()).map(([companyName, employees]) => ({
-                    id: `company_${companyName}`,
-                    name: companyName,
-                    type: 'company',
-                    company: companyName,
-                    children: employees.map(d => ({
-                        id: d.id,
-                        name: d.fullName,
-                        type: 'person',
-                        data: d,
-                        company: companyName
-                    }))
-                }))
+                children: Array.from(companiesMap.entries()).map(([companyName, employees]) => {
+                    // Show members if: global showMembers is true OR this specific company is expanded
+                    const shouldShowMembers = showMembers || expandedCompanies.has(companyName);
+
+                    return {
+                        id: `company_${companyName}`,
+                        name: companyName,
+                        type: 'company',
+                        company: companyName,
+                        employeeCount: employees.length, // Store count for tooltip even when not showing members
+                        isExpanded: expandedCompanies.has(companyName), // Track expansion state
+                        children: shouldShowMembers ? employees.map(d => ({
+                            id: d.id,
+                            name: d.fullName,
+                            type: 'person',
+                            data: d,
+                            company: companyName
+                        })) : [] // Empty children array when not showing members
+                    };
+                })
             };
 
             // Convert to hierarchy
@@ -936,13 +975,16 @@
             const nodes = hierarchy.descendants();
 
             // Calculate radius scale for company nodes based on employee count
-            const companySizes = nodes.filter(d => d.depth === 1).map(d => d.children ? d.children.length : 0);
+            const companySizes = nodes.filter(d => d.depth === 1).map(d => {
+                // Use employeeCount when members are hidden, otherwise use children length
+                return showMembers ? (d.children ? d.children.length : 0) : (d.data.employeeCount || 0);
+            });
             const maxCompanySize = Math.max(...companySizes);
-            const minCompanySize = Math.min(...companySizes);
+            const minCompanySizeValue = Math.min(...companySizes);
 
             // Scale for company node radius (10 to 30 based on employee count)
             const radiusScale = d3.scaleLinear()
-                .domain([minCompanySize, maxCompanySize])
+                .domain([minCompanySizeValue, maxCompanySize])
                 .range([10, 30]);
 
             // Create force simulation for tree layout with 3 levels
@@ -965,7 +1007,7 @@
                     // Dynamic collision radius based on node size
                     if (d.depth === 0) return 30;
                     if (d.depth === 1) {
-                        const employeeCount = d.children ? d.children.length : 0;
+                        const employeeCount = showMembers ? (d.children ? d.children.length : 0) : (d.data.employeeCount || 0);
                         return radiusScale(employeeCount) + 15;  // Add padding
                     }
                     return 15;
@@ -995,7 +1037,7 @@
                     if (d.depth === 0) return 25;      // You (center) - largest
                     if (d.depth === 1) {
                         // Company nodes - size based on employee count
-                        const employeeCount = d.children ? d.children.length : 0;
+                        const employeeCount = showMembers ? (d.children ? d.children.length : 0) : (d.data.employeeCount || 0);
                         return radiusScale(employeeCount);
                     }
                     return 6;                           // Person nodes - smallest
@@ -1015,10 +1057,19 @@
                 })
                 .attr('stroke', d => {
                     if (d.depth === 0) return '#fff';
-                    if (d.depth === 1) return '#fff';
+                    if (d.depth === 1) {
+                        // Show expanded companies with gold border when members are hidden
+                        return (!showMembers && d.data.isExpanded) ? '#ffc107' : '#fff';
+                    }
                     return '#ddd';
                 })
-                .attr('stroke-width', d => d.depth === 1 ? 3 : 2)
+                .attr('stroke-width', d => {
+                    if (d.depth === 1) {
+                        // Thicker border for expanded companies
+                        return (!showMembers && d.data.isExpanded) ? 5 : 3;
+                    }
+                    return 2;
+                })
                 .attr('opacity', d => d.depth === 2 ? 0.8 : 1)
                 .style('cursor', 'pointer')
                 .call(drag(simulation))
@@ -1026,8 +1077,22 @@
                     event.stopPropagation();  // Prevent event bubbling
 
                     if (d.depth === 1) {
-                        // Company node clicked - toggle highlight
-                        handleCompanyHighlight(d);
+                        // Company node clicked
+                        if (!showMembers) {
+                            // If members are globally hidden, toggle expansion for this company
+                            const companyName = d.data.company;
+                            if (expandedCompanies.has(companyName)) {
+                                expandedCompanies.delete(companyName);
+                                showNotification(`Collapsed ${companyName}`, 'success');
+                            } else {
+                                expandedCompanies.add(companyName);
+                                showNotification(`Expanded ${companyName} - showing ${d.data.employeeCount} connections`, 'success');
+                            }
+                            applyYearFilterAndRebuild();
+                        } else {
+                            // If members are shown, just toggle highlight
+                            handleCompanyHighlight(d);
+                        }
                     } else if (d.depth === 2) {
                         // Person node clicked
                         handleNodeClick({
@@ -1046,8 +1111,9 @@
                         name: d.data.name
                     };
                     if (d.depth === 1) {
-                        // Show company name and count
-                        tooltipData.name = `${d.data.name} (${d.children ? d.children.length : 0} connections)`;
+                        // Show company name and count (use employeeCount when members are hidden)
+                        const count = showMembers ? (d.children ? d.children.length : 0) : (d.data.employeeCount || 0);
+                        tooltipData.name = `${d.data.name} (${count} connections)`;
                     }
                     showTooltip(event, tooltipData);
                 })
@@ -1061,8 +1127,8 @@
                 .text(d => {
                     const name = d.data.name;
                     if (d.depth === 1) {
-                        // Show company name with count
-                        const count = d.children ? d.children.length : 0;
+                        // Show company name with count (use employeeCount when members are hidden)
+                        const count = showMembers ? (d.children ? d.children.length : 0) : (d.data.employeeCount || 0);
                         return `${name} (${count})`;
                     }
                     return name.length > 15 ? name.substring(0, 15) + '...' : name;
@@ -1210,12 +1276,21 @@
                 .attr('opacity', 0.7);
         }
 
-        function buildTimelineChart(data) {
-            console.log('Building timeline chart with', data.length, 'connections');
-            console.log('Sample data:', data.slice(0, 3));
+        function buildTimelineChart(data, year = null) {
+            console.log('Building timeline chart with', data.length, 'connections', year ? `for year ${year}` : '(all years)');
 
-            const width = document.getElementById('timelineChart').clientWidth;
-            const height = document.getElementById('timelineChart').clientHeight;
+            // Filter by year if specified
+            const filteredByYear = year ? data.filter(d => {
+                const date = d3.timeParse('%d %b %Y')(d.connectedOn);
+                return date && date.getFullYear() === year;
+            }) : data;
+
+            console.log('After year filter:', filteredByYear.length, 'connections');
+
+            const svgElement = document.getElementById('timelineChart');
+            const container = svgElement.parentElement;
+            const width = container.clientWidth;
+            const height = Math.max(container.clientHeight - 80, 400);
             const margin = {top: 40, right: 120, bottom: 80, left: 60};
             const innerWidth = width - margin.left - margin.right;
             const innerHeight = height - margin.top - margin.bottom;
@@ -1226,12 +1301,12 @@
             // Parse dates and group by month and company
             const parseDate = d3.timeParse('%d %b %Y');
             const dataByDate = new Map();
-            
+
             let parsedCount = 0;
             let skippedNoDate = 0;
             let skippedParseError = 0;
 
-            data.forEach(d => {
+            filteredByYear.forEach(d => {
                 if (!d.connectedOn) {
                     skippedNoDate++;
                     return;
@@ -1622,7 +1697,7 @@
                 .attr('font-size', 18)
                 .attr('font-weight', 'bold')
                 .attr('fill', '#fff')
-                .text('Connections Over Time by Company');
+                .text(year ? `Connections in ${year} by Company` : 'Connections Over Time by Company');
 
             // Add zoom instructions
             svg.append('text')
@@ -1655,19 +1730,27 @@
             });
         }
         
-        function buildBubbleChart(data) {
-            console.log('Building bubble chart');
-            
+        function buildBubbleChart(data, year = null) {
+            console.log('Building bubble chart with', data.length, 'connections', year ? `for year ${year}` : '(all years)');
+
+            // Filter by year if specified
+            const filteredByYear = year ? data.filter(d => {
+                const date = new Date(d.connectedOn);
+                return date && date.getFullYear() === year;
+            }) : data;
+
+            console.log('After year filter:', filteredByYear.length, 'connections');
+
             const width = document.getElementById('bubbleChart').clientWidth;
             const height = document.getElementById('bubbleChart').clientHeight;
             const margin = {top: 60, right: 20, bottom: 20, left: 20};
-            
+
             // Clear existing
             d3.select('#bubbleChart').selectAll('*').remove();
-            
+
             // Group by company
             const companyData = d3.rollup(
-                data,
+                filteredByYear,
                 v => v.length,
                 d => d.company || 'Unknown'
             );
@@ -1720,7 +1803,7 @@
                 .style('cursor', 'pointer');
             
             bubbles.append('circle')
-                .attr('r', d => d.r)
+                .attr('r', d => Math.max(0, d.r || 0))
                 .attr('fill', d => companyColors[d.data.name] || '#28a745')
                 .attr('opacity', 0.7)
                 .attr('stroke', '#fff')
@@ -1800,7 +1883,7 @@
                 .attr('font-size', 18)
                 .attr('font-weight', 'bold')
                 .attr('fill', '#fff')
-                .text('Connections by Company (Zoom with scroll)');
+                .text(year ? `Connections by Company in ${year}` : 'Connections by Company (Zoom with scroll)');
             
             // Add instructions
             svg.append('text')
@@ -1810,6 +1893,396 @@
                 .attr('font-size', 12)
                 .attr('fill', '#aaa')
                 .text('Scroll to zoom • Click bubble to filter');
+        }
+
+        // Graph navigation functions
+        function changeGraphYear(delta) {
+            if (currentGraphYear === null) {
+                const years = Array.from(new Set(filteredData.map(d => new Date(d.connectedOn).getFullYear()))).sort();
+                currentGraphYear = delta > 0 ? years[0] : years[years.length - 1];
+            } else {
+                currentGraphYear += delta;
+            }
+            document.getElementById('graphYear').textContent = currentGraphYear;
+            applyYearFilterAndRebuild();
+        }
+
+        function resetGraphYear() {
+            currentGraphYear = null;
+            document.getElementById('graphYear').textContent = 'All Years';
+            applyYearFilterAndRebuild();
+        }
+
+        // Timeline navigation functions
+        function changeTimelineYear(delta) {
+            if (currentTimelineYear === null) {
+                const years = Array.from(new Set(filteredData.map(d => new Date(d.connectedOn).getFullYear()))).sort();
+                currentTimelineYear = delta > 0 ? years[0] : years[years.length - 1];
+            } else {
+                currentTimelineYear += delta;
+            }
+            document.getElementById('timelineYear').textContent = currentTimelineYear;
+            buildTimelineChart(filteredData, currentTimelineYear);
+        }
+
+        function resetTimelineYear() {
+            currentTimelineYear = null;
+            document.getElementById('timelineYear').textContent = 'All Years';
+            buildTimelineChart(filteredData, null);
+        }
+
+        // Bubble chart navigation functions
+        function changeBubbleYear(delta) {
+            if (currentBubbleYear === null) {
+                const years = Array.from(new Set(filteredData.map(d => new Date(d.connectedOn).getFullYear()))).sort();
+                currentBubbleYear = delta > 0 ? years[0] : years[years.length - 1];
+            } else {
+                currentBubbleYear += delta;
+            }
+            document.getElementById('bubbleYear').textContent = currentBubbleYear;
+            buildBubbleChart(filteredData, currentBubbleYear);
+        }
+
+        function resetBubbleYear() {
+            currentBubbleYear = null;
+            document.getElementById('bubbleYear').textContent = 'All Years';
+            buildBubbleChart(filteredData, null);
+        }
+
+        // Apply year filter to graph and rebuild
+        function applyYearFilterAndRebuild() {
+            let yearFilteredData = filteredData;
+
+            if (currentGraphYear !== null) {
+                yearFilteredData = filteredData.filter(d => {
+                    const date = new Date(d.connectedOn);
+                    return date.getFullYear() === currentGraphYear;
+                });
+            }
+
+            // Apply company size filter
+            const companyCounts = new Map();
+            yearFilteredData.forEach(d => {
+                const company = d.company || 'Unknown';
+                companyCounts.set(company, (companyCounts.get(company) || 0) + 1);
+            });
+
+            const companySizeFilteredData = yearFilteredData.filter(d => {
+                const company = d.company || 'Unknown';
+                return companyCounts.get(company) >= minCompanySize;
+            });
+
+            console.log(`Year filter: ${yearFilteredData.length} connections, Company size filter (>=${minCompanySize}): ${companySizeFilteredData.length} connections`);
+
+            // Display the filtered data
+            buildGraph(companySizeFilteredData);
+            updateStats();
+        }
+
+        // Update minimum company size filter
+        function updateMinCompanySize(value) {
+            minCompanySize = parseInt(value);
+            applyYearFilterAndRebuild();
+        }
+
+        // Toggle show/hide individual members
+        function toggleShowMembers(checked) {
+            showMembers = checked;
+            if (checked) {
+                // Clear expanded companies when showing all members
+                expandedCompanies.clear();
+                showNotification('Showing all individual connections', 'success');
+            } else {
+                showNotification('Showing companies only - click a company to expand it', 'success');
+            }
+            applyYearFilterAndRebuild();
+        }
+
+        // Calendar navigation functions
+        function changeCalendarYear(delta) {
+            currentCalendarYear += delta;
+            document.getElementById('calendarYear').textContent = currentCalendarYear;
+            buildCalendarChart(filteredData, currentCalendarYear);
+        }
+
+        function buildCalendarChart(data, year) {
+            console.log('Building calendar chart for year:', year);
+
+            // Get the parent container instead of the SVG element
+            const svgElement = document.getElementById('calendarChart');
+            const container = svgElement.parentElement; // Get the .graph-container div
+
+            // Log container dimensions for debugging
+            console.log('Calendar container info:', {
+                containerClass: container.className,
+                clientWidth: container.clientWidth,
+                clientHeight: container.clientHeight,
+                offsetWidth: container.offsetWidth,
+                offsetHeight: container.offsetHeight,
+                computedStyle: window.getComputedStyle(container).width
+            });
+
+            const width = container.clientWidth || 1200;
+            const height = Math.max(container.clientHeight - 80, 600); // Ensure minimum height
+
+            console.log('Using width:', width, 'height:', height);
+
+            // Clear existing
+            d3.select('#calendarChart').selectAll('*').remove();
+
+            // Filter data for the selected year
+            const yearData = data.filter(d => {
+                const date = new Date(d.connectedOn);
+                return date.getFullYear() === year;
+            });
+
+            // Aggregate connections by date
+            const dateMap = d3.rollup(
+                yearData,
+                v => v.length,
+                d => d3.timeDay.floor(new Date(d.connectedOn)).toISOString().split('T')[0]
+            );
+
+            // Convert to array for max calculation
+            const counts = Array.from(dateMap.values());
+            const maxCount = counts.length > 0 ? d3.max(counts) : 1;
+
+            console.log(`Year ${year}: ${yearData.length} connections, max per day: ${maxCount}`);
+
+            // Create color scale
+            const colorScale = d3.scaleSequential()
+                .domain([0, maxCount])
+                .interpolator(d3.interpolateBlues);
+
+            // Calendar dimensions - sized to fit viewport
+            const cellSize = 10; // Slightly smaller cell size
+            const weekGap = 1;
+            const weekWidth = cellSize + weekGap;
+            const monthLabelHeight = 20;
+            const dayLabelWidth = 12;
+
+            // Calculate dimensions for horizontal month layout (6 months per row)
+            const monthWidth = (weekWidth * 5) + dayLabelWidth + 12; // ~5 weeks per month + labels
+            const monthHeight = (weekWidth * 7) + monthLabelHeight + 15; // 7 days + label
+
+            // Calculate total calendar size
+            const totalCalendarWidth = monthWidth * 6 + 80; // 6 months per row + margins
+            const totalCalendarHeight = monthHeight * 2 + 120; // 2 rows + margins
+
+            const svg = d3.select('#calendarChart')
+                .attr('width', width)
+                .attr('height', height);
+
+            // Add scrollable group
+            const mainGroup = svg.append('g');
+
+            // Title
+            svg.append('text')
+                .attr('x', width / 2)
+                .attr('y', 30)
+                .attr('text-anchor', 'middle')
+                .attr('font-size', 22)
+                .attr('font-weight', 'bold')
+                .attr('fill', '#fff')
+                .text(`Connection Activity Calendar - ${year}`);
+
+            // Create a group for each month - horizontal layout (months side by side)
+            const months = d3.timeMonths(new Date(year, 0, 1), new Date(year, 11, 31));
+
+            const monthGroups = mainGroup.append('g')
+                .attr('transform', `translate(40, 70)`)
+                .selectAll('g')
+                .data(months)
+                .join('g')
+                .attr('transform', (d, i) => {
+                    // Arrange months horizontally, 6 per row
+                    const col = i % 6;
+                    const row = Math.floor(i / 6);
+                    return `translate(${col * monthWidth}, ${row * monthHeight})`;
+                });
+
+            // Month labels (at the top of each month)
+            monthGroups.append('text')
+                .attr('x', monthWidth / 2)
+                .attr('y', 0)
+                .attr('text-anchor', 'middle')
+                .attr('font-size', 12)
+                .attr('font-weight', 'bold')
+                .attr('fill', '#fff')
+                .text(d => d3.timeFormat('%b')(d)); // Abbreviated month name
+
+            // Tooltip
+            const tooltip = d3.select('body').append('div')
+                .attr('class', 'calendar-tooltip')
+                .style('position', 'absolute')
+                .style('background', 'rgba(0, 0, 0, 0.9)')
+                .style('color', 'white')
+                .style('padding', '8px 12px')
+                .style('border-radius', '5px')
+                .style('font-size', '12px')
+                .style('pointer-events', 'none')
+                .style('opacity', 0)
+                .style('z-index', 10000);
+
+            // Create cells for each month - grid layout
+            monthGroups.each(function(monthDate) {
+                const group = d3.select(this);
+                const monthStart = d3.timeMonth.floor(monthDate);
+                const monthEnd = d3.timeMonth.offset(monthStart, 1);
+                const days = d3.timeDays(monthStart, monthEnd);
+
+                // Add day cells - positioned in weekly grid
+                const cells = group.selectAll('rect')
+                    .data(days)
+                    .join('rect')
+                    .attr('width', cellSize)
+                    .attr('height', cellSize)
+                    .attr('x', d => {
+                        // Week number within this month
+                        const weekInMonth = d3.timeWeek.count(monthStart, d);
+                        return dayLabelWidth + (weekInMonth * weekWidth);
+                    })
+                    .attr('y', d => monthLabelHeight + (d.getDay() * weekWidth))
+                    .attr('fill', d => {
+                        const dateStr = d.toISOString().split('T')[0];
+                        const count = dateMap.get(dateStr) || 0;
+                        return count > 0 ? colorScale(count) : '#2a2a2a';
+                    })
+                    .attr('stroke', '#444')
+                    .attr('stroke-width', 0.5)
+                    .attr('rx', 1)
+                    .style('cursor', 'pointer')
+                    .on('mouseover', function(event, d) {
+                        const dateStr = d.toISOString().split('T')[0];
+                        const count = dateMap.get(dateStr) || 0;
+
+                        d3.select(this)
+                            .attr('stroke', '#fff')
+                            .attr('stroke-width', 2);
+
+                        tooltip
+                            .html(`
+                                <strong>${d3.timeFormat('%B %d, %Y')(d)}</strong><br/>
+                                ${count} connection${count !== 1 ? 's' : ''}
+                            `)
+                            .style('left', (event.pageX + 15) + 'px')
+                            .style('top', (event.pageY - 15) + 'px')
+                            .style('opacity', 1);
+                    })
+                    .on('mouseout', function() {
+                        d3.select(this)
+                            .attr('stroke', '#444')
+                            .attr('stroke-width', 0.5);
+
+                        tooltip.style('opacity', 0);
+                    });
+
+                // Add day of week labels (on the left side)
+                if (monthDate.getMonth() === 0 || monthDate.getMonth() === 6) {
+                    const weekdays = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
+                    group.selectAll('text.weekday')
+                        .data(weekdays)
+                        .join('text')
+                        .attr('class', 'weekday')
+                        .attr('x', dayLabelWidth - 3)
+                        .attr('y', (d, i) => monthLabelHeight + (i * weekWidth) + cellSize / 2)
+                        .attr('dy', '0.3em')
+                        .attr('text-anchor', 'end')
+                        .attr('font-size', 8)
+                        .attr('fill', '#999')
+                        .text(d => d);
+                }
+            });
+
+            // Legend
+            const legendWidth = Math.min(300, width - 100);
+            const legendHeight = 20;
+            const legendX = Math.max(60, width - legendWidth - 40);
+            const legendY = height - 50;
+
+            const legendScale = d3.scaleLinear()
+                .domain([0, maxCount])
+                .range([0, legendWidth]);
+
+            const legend = svg.append('g')
+                .attr('transform', `translate(${legendX}, ${legendY})`);
+
+            // Legend gradient
+            const defs = svg.append('defs');
+            const gradient = defs.append('linearGradient')
+                .attr('id', 'legend-gradient');
+
+            gradient.selectAll('stop')
+                .data(d3.range(0, 1.1, 0.1))
+                .join('stop')
+                .attr('offset', d => d)
+                .attr('stop-color', d => colorScale(d * maxCount));
+
+            legend.append('rect')
+                .attr('width', legendWidth)
+                .attr('height', legendHeight)
+                .style('fill', 'url(#legend-gradient)')
+                .attr('stroke', '#fff')
+                .attr('stroke-width', 1);
+
+            // Legend axis
+            const legendAxis = d3.axisBottom(legendScale)
+                .ticks(5)
+                .tickFormat(d => Math.round(d));
+
+            legend.append('g')
+                .attr('transform', `translate(0, ${legendHeight})`)
+                .call(legendAxis)
+                .call(g => g.select('.domain').attr('stroke', '#fff'))
+                .call(g => g.selectAll('.tick line').attr('stroke', '#fff'))
+                .call(g => g.selectAll('.tick text').attr('fill', '#fff').attr('font-size', 10));
+
+            legend.append('text')
+                .attr('x', -10)
+                .attr('y', legendHeight / 2)
+                .attr('dy', '0.3em')
+                .attr('text-anchor', 'end')
+                .attr('font-size', 11)
+                .attr('fill', '#fff')
+                .text('Connections per day:');
+
+            // Summary stats
+            svg.append('text')
+                .attr('x', 40)
+                .attr('y', height - 20)
+                .attr('font-size', 12)
+                .attr('fill', '#aaa')
+                .text(`Total connections in ${year}: ${yearData.length} • Peak day: ${maxCount} connections`);
+
+            // Add zoom and pan
+            const zoom = d3.zoom()
+                .scaleExtent([0.5, 6])
+                .on('zoom', (event) => {
+                    mainGroup.attr('transform', event.transform);
+                });
+
+            svg.call(zoom);
+
+            // Set initial zoom to fit content perfectly in viewport
+            const scaleToFit = Math.min(
+                (width - 100) / totalCalendarWidth,
+                (height - 140) / totalCalendarHeight
+            ) * 0.98;
+
+            // Center the calendar horizontally
+            const translateX = (width - (totalCalendarWidth * scaleToFit)) / 2;
+            svg.call(zoom.transform, d3.zoomIdentity
+                .translate(translateX, 0)
+                .scale(scaleToFit));
+
+            // Instructions
+            svg.append('text')
+                .attr('x', width - 40)
+                .attr('y', height - 20)
+                .attr('text-anchor', 'end')
+                .attr('font-size', 11)
+                .attr('fill', '#aaa')
+                .text('Scroll to zoom • Drag to pan');
         }
         
         function drag(simulation) {
@@ -1951,12 +2424,10 @@
             });
             
             if (allData.length > 0) {
-                currentBatch = 1;
-                displayedData = filteredData.slice(0, Math.min(BATCH_SIZE, filteredData.length));
-                console.log(`After filter: displaying ${displayedData.length} of ${filteredData.length}`);
-                buildGraph(displayedData);
-                updateStats();
-                updateLoadMoreButton();
+                console.log(`After filter: ${filteredData.length} connections`);
+                applyYearFilterAndRebuild();
+                buildTimelineChart(filteredData, currentTimelineYear);
+                buildBubbleChart(filteredData, currentBubbleYear);
             }
         }
         
@@ -1966,32 +2437,12 @@
             document.getElementById('filterPosition').value = '';
             document.getElementById('filterDate').value = '';
             filteredData = [...allData];
-            currentBatch = 0;
             if (allData.length > 0) {
-                displayedData = filteredData.slice(0, Math.min(BATCH_SIZE, filteredData.length));
-                buildGraph(displayedData);
-                updateStats();
-                updateLoadMoreButton();
+                applyYearFilterAndRebuild();
+                buildTimelineChart(filteredData, currentTimelineYear);
+                buildBubbleChart(filteredData, currentBubbleYear);
             }
             selectedNode = null;
-        }
-        
-        function updateLoadMoreButton() {
-            const loadMoreBtn = document.getElementById('loadMoreBtn');
-            const remaining = filteredData.length - displayedData.length;
-            
-            // Only show load more button in graph view
-            if (currentViz !== 'graph') {
-                loadMoreBtn.style.display = 'none';
-                return;
-            }
-            
-            if (remaining > 0) {
-                loadMoreBtn.style.display = 'inline-block';
-                loadMoreBtn.textContent = `➕ Load More (${Math.min(BATCH_SIZE, remaining)})`;
-            } else {
-                loadMoreBtn.style.display = 'none';
-            }
         }
         
         function toggleSidebar() {
@@ -2021,20 +2472,13 @@
         
         function updateStats() {
             document.getElementById('stats').style.display = 'flex';
-            document.getElementById('totalConnections').textContent = filteredData.length;
-            document.getElementById('displayedConnections').textContent = displayedData.length;
-            
+            document.getElementById('totalConnections').textContent = allData.length;
+            document.getElementById('displayedConnections').textContent = filteredData.length;
+
             // Update header count
             const countEl = document.getElementById('connectionCount');
             countEl.style.display = 'inline-block';
-            
-            if (currentViz === 'graph') {
-                countEl.textContent = `${displayedData.length} / ${filteredData.length} connections`;
-            } else {
-                countEl.textContent = `${filteredData.length} connections (all)`;
-            }
-            
-            updateLoadMoreButton();
+            countEl.textContent = `${filteredData.length} connections`;
         }
         
         function showLoading(show) {
@@ -2057,6 +2501,259 @@
             }, 3000);
         }
         
+        // Career Timeline Functions
+        let careerChart = null;
+
+        function loadCareerCSV() {
+            document.getElementById('careerCsvFile').click();
+        }
+
+        document.getElementById('careerCsvFile').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            Papa.parse(file, {
+                header: true,
+                skipEmptyLines: true,
+                complete: function(results) {
+                    console.log('Career CSV loaded:', results.data);
+                    buildCareerTimeline(results.data);
+                    document.getElementById('careerStatus').textContent = `${results.data.length} positions loaded`;
+                    document.getElementById('careerStatus').style.display = 'inline-block';
+                },
+                error: function(error) {
+                    console.error('Error parsing career CSV:', error);
+                    showNotification('Error loading career CSV file', 'error');
+                }
+            });
+        });
+
+        function buildCareerTimeline(data) {
+            // Clear previous chart
+            if (careerChart) {
+                careerChart.dispose();
+            }
+
+            // Count connections per company from LinkedIn data (if loaded)
+            const companyCounts = {};
+            if (allData && allData.length > 0) {
+                allData.forEach(conn => {
+                    const company = conn.company || 'Unknown';
+                    companyCounts[company] = (companyCounts[company] || 0) + 1;
+                });
+            }
+
+            // Create timeline chart
+            careerChart = anychart.timeline();
+
+            // Set chart title
+            careerChart.title('Professional Career Timeline');
+
+            // Prepare data for moment series (the info boxes)
+            const titleDescData = [];
+            const locationData = [];
+            const connectionsData = [];
+
+            // Create a range series for each position
+            data.forEach((position, index) => {
+                const startDate = parseCareerDate(position['Started On']);
+                const endDate = position['Finished On'] ? parseCareerDate(position['Finished On']) : new Date();
+                const midDate = new Date((startDate.getTime() + endDate.getTime()) / 2);
+                const color = getCareerColor(position['Company Name']);
+                const title = position['Title'];
+                const company = position['Company Name'];
+                const description = position['Description'] || '';
+                const location = position['Location'] || '';
+                const connectionCount = companyCounts[company] || 0;
+
+                // Add data for moment series (info boxes)
+                // Box 1: Title + Description
+                titleDescData.push({
+                    x: midDate.getTime(),
+                    title: title,
+                    company: company,
+                    description: description,
+                    color: color
+                });
+
+                // Box 2: Location
+                if (location) {
+                    locationData.push({
+                        x: midDate.getTime(),
+                        location: location,
+                        company: company,
+                        color: color
+                    });
+                }
+
+                // Box 3: Connections
+                if (connectionCount > 0) {
+                    connectionsData.push({
+                        x: midDate.getTime(),
+                        count: connectionCount,
+                        company: company,
+                        color: color
+                    });
+                }
+
+                // Create range series with the position data (the timeline bar)
+                var series = careerChart.range([
+                    [company, startDate.getTime(), endDate.getTime()]
+                ]);
+
+                // Set the bar color
+                series.fill(color);
+                series.stroke(color);
+
+                // Configure bar height
+                series.height(25);
+
+                // Enable labels on the bar to show company name
+                series.labels().enabled(true);
+                series.labels().fontColor('white');
+                series.labels().fontSize(12);
+                series.labels().fontWeight('bold');
+
+                // Simplified tooltip
+                series.tooltip().useHtml(true);
+                series.tooltip().titleFormat('<h5>{%x}</h5>');
+                series.tooltip().format(function() {
+                    const startDate = new Date(this.start);
+                    const endDate = new Date(this.end);
+                    const monthsDiff = Math.round((endDate - startDate) / (1000 * 60 * 60 * 24 * 30));
+                    const years = Math.floor(monthsDiff / 12);
+                    const months = monthsDiff % 12;
+                    const duration = years > 0 ? `${years}y ${months}m` : `${months}m`;
+
+                    return `<div style="padding: 10px;">
+                        <div style="margin-bottom: 3px;">${formatCareerDate(startDate)} - ${formatCareerDate(endDate)}</div>
+                        <div style="margin-bottom: 5px; color: #666;">Duration: ${duration}</div>
+                    </div>`;
+                });
+            });
+
+            // Create moment series for info boxes
+
+            // 1. Title + Description boxes (topmost)
+            if (titleDescData.length > 0) {
+                var titleDescSeries = careerChart.moment(titleDescData.map(d => ({
+                    x: d.x,
+                    value: 'title-desc'
+                })));
+
+                titleDescSeries.labels().enabled(true);
+                titleDescSeries.labels().useHtml(true);
+                titleDescSeries.labels().padding(5);
+                titleDescSeries.labels().format(function() {
+                    const data = titleDescData[this.index];
+                    const shortDesc = data.description.length > 100 ? data.description.substring(0, 100) + '...' : data.description;
+                    return `<div style="padding: 8px; background: white; border-radius: 5px; border-left: 4px solid ${data.color}; box-shadow: 0 2px 4px rgba(0,0,0,0.1); max-width: 300px;">
+                        <div style="font-weight: bold; color: #0077b5; margin-bottom: 3px;">${data.title}</div>
+                        ${data.description ? `<div style="font-size: 11px; color: #555;">${shortDesc}</div>` : ''}
+                    </div>`;
+                });
+                titleDescSeries.tooltip().enabled(false);
+            }
+
+            // 2. Location boxes (middle)
+            if (locationData.length > 0) {
+                var locationSeries = careerChart.moment(locationData.map(d => ({
+                    x: d.x,
+                    value: 'location'
+                })));
+
+                locationSeries.labels().enabled(true);
+                locationSeries.labels().useHtml(true);
+                locationSeries.labels().padding(5);
+                locationSeries.labels().format(function() {
+                    const data = locationData[this.index];
+                    return `<div style="padding: 6px 10px; background: white; border-radius: 5px; border-left: 4px solid ${data.color}; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                        <div style="font-size: 11px; color: #666;">📍 ${data.location}</div>
+                    </div>`;
+                });
+                locationSeries.tooltip().enabled(false);
+            }
+
+            // 3. Connections boxes (lowest, just above the bar)
+            if (connectionsData.length > 0) {
+                var connectionsSeries = careerChart.moment(connectionsData.map(d => ({
+                    x: d.x,
+                    value: 'connections'
+                })));
+
+                connectionsSeries.labels().enabled(true);
+                connectionsSeries.labels().useHtml(true);
+                connectionsSeries.labels().padding(5);
+                connectionsSeries.labels().format(function() {
+                    const data = connectionsData[this.index];
+                    return `<div style="padding: 6px 10px; background: white; border-radius: 5px; border-left: 4px solid ${data.color}; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                        <div style="font-size: 11px; color: #28a745; font-weight: bold;">👥 ${data.count} connections</div>
+                    </div>`;
+                });
+                connectionsSeries.tooltip().enabled(false);
+            }
+
+            // Configure axis
+            var axis = careerChart.axis();
+            axis.height(25);
+
+            // Enable scroller
+            careerChart.scroller().enabled(true);
+
+            // Set container and draw
+            careerChart.container('careerTimeline');
+            careerChart.background().fill({
+                keys: ['#667eea', '#764ba2'],
+                angle: 135
+            });
+            careerChart.draw();
+
+            showNotification('Career timeline loaded successfully!', 'success');
+        }
+
+        function parseCareerDate(dateStr) {
+            if (!dateStr) return new Date();
+
+            // Handle format like "Jul 2022" or "Feb 2016"
+            const parts = dateStr.trim().split(' ');
+            if (parts.length === 2) {
+                const months = {
+                    'Jan': 0, 'Feb': 1, 'Mar': 2, 'Apr': 3, 'May': 4, 'Jun': 5,
+                    'Jul': 6, 'Aug': 7, 'Sep': 8, 'Oct': 9, 'Nov': 10, 'Dec': 11
+                };
+                const month = months[parts[0]];
+                const year = parseInt(parts[1]);
+                return new Date(year, month, 1);
+            }
+
+            return new Date(dateStr);
+        }
+
+        function formatCareerDate(date) {
+            const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+                          'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+            return `${months[date.getMonth()]} ${date.getFullYear()}`;
+        }
+
+        function getCareerColor(companyName) {
+            // Define color palette for career timeline
+            const colors = [
+                '#0077b5', '#28a745', '#dc3545', '#ffc107', '#17a2b8',
+                '#6f42c1', '#fd7e14', '#20c997', '#e83e8c', '#6c757d',
+                '#007bff', '#28a745', '#ffc107', '#dc3545', '#17a2b8'
+            ];
+
+            // Check if company already has a color assigned from LinkedIn connections
+            if (companyColors[companyName]) {
+                return companyColors[companyName];
+            }
+
+            // Otherwise assign a new color based on current companies count
+            const colorIndex = Object.keys(companyColors).length % colors.length;
+            companyColors[companyName] = colors[colorIndex];
+            return companyColors[companyName];
+        }
+
         // Handle window resize
         let resizeTimeout;
         window.addEventListener('resize', () => {
@@ -2065,8 +2762,18 @@
                 // Debounce resize to avoid multiple calls
                 clearTimeout(resizeTimeout);
                 resizeTimeout = setTimeout(() => {
-                    console.log('Rebuilding graph after resize with displayedData:', displayedData.length);
-                    buildGraph(displayedData);
+                    console.log('Rebuilding visualizations after resize');
+                    if (currentViz === 'graph') {
+                        applyYearFilterAndRebuild();
+                    } else if (currentViz === 'timeline') {
+                        buildTimelineChart(filteredData, currentTimelineYear);
+                    } else if (currentViz === 'bubble') {
+                        buildBubbleChart(filteredData, currentBubbleYear);
+                    } else if (currentViz === 'calendar') {
+                        buildCalendarChart(filteredData, currentCalendarYear);
+                    } else if (currentViz === 'career' && careerChart) {
+                        careerChart.draw();
+                    }
                 }, 250);
             }
         });

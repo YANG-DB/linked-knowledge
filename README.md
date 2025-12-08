@@ -9,12 +9,20 @@ A modern, interactive web application for visualizing and exploring your LinkedI
 *Hierarchical visualization with you at the center, companies in the middle layer, and individual connections on the outer layer. Click a company node to highlight its connections.*
 
 ### Timeline Chart
-![Timeline Chart](screenshots/timeline-chart.png)
+![Timeline Chart](images/timline-chart.png)
 *Stacked bar chart showing connections over time by company. Scroll to zoom and explore different time periods. Synchronized with network graph selection.*
 
 ### Bubble Chart
 ![Bubble Chart](screenshots/bubble-chart.png)
 *Interactive bubble chart showing connection distribution across companies. Larger bubbles represent more connections.*
+
+### Calendar Heatmap (Activity Chart)
+![Calendar Heatmap](images/activity-chart.png)
+*GitHub-style calendar heatmap showing daily connection activity. Navigate between years to explore networking patterns over time.*
+
+### Professional Career Timeline
+![Career Timeline](images/profession-chart.png)
+*AnyChart-powered career timeline visualization showing your professional journey. Displays position titles, descriptions, locations, and connection counts from each company. Each position shows as a colored bar with stacked info boxes above containing role details and LinkedIn network statistics.*
 
 ## 🌟 Features
 
@@ -22,6 +30,8 @@ A modern, interactive web application for visualizing and exploring your LinkedI
 - **📊 Interactive Network Graph**: Hierarchical visualization with you → companies → people
 - **📈 Timeline Chart**: Stacked bar chart showing connection growth over time
 - **⚪ Bubble Chart**: Company distribution visualization by connection count
+- **📅 Calendar Heatmap**: GitHub-style daily activity visualization with year navigation
+- **💼 Career Timeline**: Professional journey visualization with position details and network statistics
 - **🔍 Smart Search**: Real-time search across names, companies, positions, and emails
 - **🎯 Company Filtering**: Multi-select company filter with color-coded legend
 - **📱 Responsive Design**: Works seamlessly on desktop and mobile devices
@@ -42,6 +52,23 @@ A modern, interactive web application for visualizing and exploring your LinkedI
   - Size represents connection count per company
   - Zoom and pan support
   - Tooltip with detailed counts
+- **Calendar Heatmap**: Daily connection activity
+  - GitHub-style heatmap grid (12 months x 7 days)
+  - Color intensity shows connections per day
+  - Navigate between years with arrow buttons
+  - Hover tooltips with exact date and count
+  - Legend with gradient scale
+- **Career Timeline**: Professional positions visualization
+  - AnyChart-powered timeline with horizontal bars for each position
+  - Stacked info boxes above each position showing:
+    - Job title and description (top box)
+    - Location (middle box)
+    - LinkedIn connection count per company (bottom box)
+  - Company names displayed on timeline bars in white text
+  - Color-coded by company matching network graph colors
+  - Scroll and zoom for detailed exploration
+  - Loads from separate positions CSV file
+  - Shows career progression chronologically
 
 ### Network Statistics
 - Total connections count
@@ -54,6 +81,7 @@ A modern, interactive web application for visualizing and exploring your LinkedI
 - Modern web browser with ES modules support (Chrome, Firefox, Edge, Safari)
 - Internet connection (for loading dependencies)
 - LinkedIn Connections export CSV file
+- (Optional) Positions CSV file for career timeline visualization
 
 ## 🚀 Quick Start
 
@@ -95,6 +123,22 @@ npx http-server
 2. Select your `Connections.csv` file
 3. Wait for the graph to load
 4. Explore your network!
+
+### 4. (Optional) Load Career Timeline
+
+1. Click the "💼 Career Timeline" tab
+2. Click the "📁 Load Career CSV" button
+3. Select your positions CSV file (see format below)
+4. View your professional journey with LinkedIn connection counts
+
+**Positions CSV Format:**
+```csv
+Company Name,Title,Description,Location,Started On,Finished On
+Amazon,Senior SDE,"Building distributed systems...","Seattle, WA",Jan 2022,
+Google,Software Engineer,"Developed ML pipelines...","Mountain View, CA",Jul 2016,Dec 2021
+```
+
+See [Positions.csv](Positions.csv) for a complete example.
 
 ## 🎮 Usage Guide
 
@@ -139,6 +183,7 @@ linkedin-graph-explorer/
 ### Dependencies (loaded via CDN)
 - **D3.js v7.8.5**: Data visualization and force-directed layouts
 - **PapaParse 5.4.1**: CSV parsing and data transformation
+- **AnyChart v8**: Professional career timeline visualization
 
 ### Browser Support
 - Chrome/Edge: ✅ Full support
@@ -177,16 +222,22 @@ const BATCH_SIZE = 100;  // Change this value (default: 100)
 
 ## 🔮 Future Enhancements
 
+### Completed Features
+- [x] Timeline view showing connection growth over time
+- [x] Bubble chart by company size
+- [x] Company color coding with legend
+- [x] Batch loading for large networks (>1000 connections)
+- [x] Calendar heatmap for daily activity
+- [x] Professional career timeline with position details
+- [x] LinkedIn network statistics per company in career view
+
 ### Planned Features
-- [ ] Timeline view showing connection growth over time
-- [ ] Bubble chart by company size
-- [ ] Company color coding with legend
-- [ ] Batch loading for large networks (>1000 connections)
 - [ ] Connection strength indicators
 - [ ] Mutual connections detection
 - [ ] Industry clustering
 - [ ] Export as PNG/SVG
 - [ ] Dark mode toggle
+- [ ] Calendar click to filter connections by date
 
 ### LinkedIn API Integration (Advanced)
 To fetch live LinkedIn data, you would need to:
