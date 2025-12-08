@@ -28,7 +28,7 @@ What followed was fascinating:
 A single-file web application that transforms your LinkedIn connections export into **five interactive visualizations**:
 
 ### 1️⃣ Network Graph View
-[SCREENSHOT_PLACEHOLDER_1]
+![Network Graph](images/network-chart.png)
 
 **Hierarchical force-directed graph** with you at the center, companies in the middle ring, and individual connections on the outer ring.
 
@@ -41,7 +41,7 @@ A single-file web application that transforms your LinkedIn connections export i
 - **Interactive**: Drag nodes, zoom, pan, and click to explore
 
 ### 2️⃣ Timeline Chart
-[SCREENSHOT_PLACEHOLDER_2]
+![Timeline Chart](images/timline-chart.png)
 
 **Stacked bar chart** showing connection growth over time by company.
 
@@ -53,7 +53,7 @@ A single-file web application that transforms your LinkedIn connections export i
 - See exactly when your network expanded
 
 ### 3️⃣ Bubble Chart
-[SCREENSHOT_PLACEHOLDER_3]
+![Bubble Chart](images/bubble-chart.png)
 
 **Packed circle visualization** where bubble size = connection count per company.
 

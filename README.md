@@ -5,7 +5,7 @@ A modern, interactive web application for visualizing and exploring your LinkedI
 ## 📸 Screenshots
 
 ### Network Graph View
-![Network Graph](images/network-graph.png)
+![Network Graph](images/network-chart.png)
 *Hierarchical visualization with you at the center, companies in the middle layer, and individual connections on the outer layer. Click a company node to highlight its connections.*
 
 ### Timeline Chart
