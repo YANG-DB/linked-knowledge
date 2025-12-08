@@ -5,7 +5,7 @@ A modern, interactive web application for visualizing and exploring your LinkedI
 ## 📸 Screenshots
 
 ### Network Graph View
-![Network Graph](screenshots/network-graph.png)
+![Network Graph](images/network-graph.png)
 *Hierarchical visualization with you at the center, companies in the middle layer, and individual connections on the outer layer. Click a company node to highlight its connections.*
 
 ### Timeline Chart
@@ -13,7 +13,7 @@ A modern, interactive web application for visualizing and exploring your LinkedI
 *Stacked bar chart showing connections over time by company. Scroll to zoom and explore different time periods. Synchronized with network graph selection.*
 
 ### Bubble Chart
-![Bubble Chart](screenshots/bubble-chart.png)
+![Bubble Chart](images/bubble-chart.png)
 *Interactive bubble chart showing connection distribution across companies. Larger bubbles represent more connections.*
 
 ### Calendar Heatmap (Activity Chart)
