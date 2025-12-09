@@ -2,27 +2,75 @@
 
 A modern, interactive web application for visualizing and exploring your LinkedIn network connections using force-directed graph visualization.
 
-## 📸 Screenshots
+## 📸 Screenshots & Demos
 
-### Network Graph View
-![Network Graph](images/network-chart.png)
-*Hierarchical visualization with you at the center, companies in the middle layer, and individual connections on the outer layer. Click a company node to highlight its connections.*
+> **Interactive Demonstrations**: See the visualizations in action with animated GIFs below!
 
-### Timeline Chart
+### 🔵 Network Graph View
+![Network Graph Showcase](images/network-showcase.gif)
+
+**Hierarchical force-directed graph** with 3 or 4-level structure
+
+✨ **What you see:**
+- Toggle profession grouping to add a middle layer (You → Companies → Professions → People)
+- Hover over a company for 3 seconds to fade others and focus
+- Click companies to highlight their connections
+- Drag nodes to rearrange, zoom and pan to explore
+- Color-coded companies with lighter shades for professions
+
+---
+
+### 📈 Timeline Chart
 ![Timeline Chart](images/timline-chart.png)
-*Stacked bar chart showing connections over time by company. Scroll to zoom and explore different time periods. Synchronized with network graph selection.*
 
-### Bubble Chart
-![Bubble Chart](images/bubble-chart.png)
-*Interactive bubble chart showing connection distribution across companies. Larger bubbles represent more connections.*
+**Stacked bar chart** showing connection growth over time
 
-### Calendar Heatmap (Activity Chart)
-![Calendar Heatmap](images/activity-chart.png)
-*GitHub-style calendar heatmap showing daily connection activity. Navigate between years to explore networking patterns over time.*
+✨ **What you see:**
+- Monthly aggregation with intelligent tick intervals
+- Scroll to zoom in/out for detailed exploration
+- Year-by-year navigation
+- Synchronized with network graph selection
 
-### Professional Career Timeline
-![Career Timeline](images/profession-chart.png)
-*AnyChart-powered career timeline visualization showing your professional journey. Displays position titles, descriptions, locations, and connection counts from each company. Each position shows as a colored bar with stacked info boxes above containing role details and LinkedIn network statistics.*
+---
+
+### ⚪ Bubble Chart with Company Network Modal
+![Bubble Chart Showcase](images/bubble-showcase.gif)
+
+**Interactive packed circles** sized by connection count
+
+✨ **What you see:**
+- Click any bubble to open a detailed company network modal
+- Modal displays 3-level graph: Company → Professions → People
+- View individual person details in the sidebar
+- Zoom and pan support
+
+---
+
+### 📅 Calendar Heatmap with Daily Connections
+![Calendar Heatmap Showcase](images/activity-showcase.gif)
+
+**GitHub-style activity heatmap** for daily networking patterns
+
+✨ **What you see:**
+- Navigate between years with arrow buttons
+- Color intensity shows connections per day
+- Click any day to view all connections made that day
+- Connection cards display name, company, position
+- Click cards to view full person details
+
+---
+
+### 💼 Professional Career Timeline
+![Career Timeline Showcase](images/career-showcase.gif)
+
+**AnyChart-powered timeline** of your professional journey
+
+✨ **What you see:**
+- Horizontal bars for each position with start/end dates
+- Stacked info boxes showing title, location, and connection count
+- Click company bars to open detailed network modals
+- Color-coded by company matching the network graph
+- Scroll and zoom to explore career progression
 
 ## 🌟 Features
 

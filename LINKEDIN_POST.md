@@ -2,9 +2,10 @@
 
 ## The Spark of an Idea
 
-Like many professionals, I've been building my LinkedIn network for years. But I realized something: **I had no real visual understanding of my network**. Who are my most connected companies? How has my network grown over time? What patterns exist in my professional connections?
+Like many professionals, I've been building my LinkedIn network for years. I often wanted to actually view the relationship network **I had no real visual understanding of my network**.
+Who are my most connected companies? How has my network grown over time? What patterns exist in my professional connections?
 
-That simple curiosity led me on an unexpected journey—one where **AI became my coding partner** to build something I'd never attempted before.
+That simple curiosity led me on a journey where **AI became my coding partner** to build something completely without coding (which is not my usual way 😅)
 
 ---
 
@@ -17,7 +18,6 @@ I had an idea but wanted to completly avoid any web development, I was eager to 
 What followed was fascinating:
 - **Iterative Development**: I described features, Claude generated code, I tested and refined
 - **Real-time Problem Solving**: Bugs? Fixed. Performance issues? Optimized. New ideas? Implemented
-- **Learning by Building**: I learned D3.js, force-directed graphs, and data visualization principles through the process
 
 **The entire application was AI-generated**, from the initial HTML structure to the final interactive visualizations. No manual coding—just conversation, feedback, and iteration.
 
@@ -43,6 +43,12 @@ A single-file web application that transforms your LinkedIn connections export i
 - **Interactive**: Drag nodes, zoom, pan, and click to explore
 - **Advanced Physics**: Strong force simulation for clear layered positioning
 
+✨ **A short animation showcase:** 
+
+![ShowCase](images/network-showcase.gif)
+
+---
+
 ### 2️⃣ Timeline Chart
 ![Timeline Chart](images/timline-chart.png)
 
@@ -67,6 +73,12 @@ A single-file web application that transforms your LinkedIn connections export i
 - Modal shows 3-level graph: Company → Professions → People
 - See which companies dominate your network
 
+✨ **A short animation showcase:** 
+
+![ShowCase](images/bubble-showcase.gif)
+
+---
+
 ### 4️⃣ Calendar Heatmap
 ![Activity Chart](images/activity-chart.png)
 
@@ -79,6 +91,12 @@ A single-file web application that transforms your LinkedIn connections export i
 - Connection cards show name, company, position with quick view
 - Identify networking patterns and active periods
 - Discover your peak networking times
+
+✨ **A short animation showcase:** 
+
+![ShowCase](images/activity-showcase.gif)
+
+---
 
 ### 5️⃣ Professional Career Timeline
 ![Career Timeline](images/profession-chart.png)
@@ -97,6 +115,10 @@ A single-file web application that transforms your LinkedIn connections export i
 - View company-specific connections grouped by profession
 - Scroll and zoom to explore career progression
 - Load from separate positions CSV file
+
+✨ **A short animation showcase:** 
+
+![ShowCase](images/career-showcase.gif)
 
 ---
 
@@ -118,18 +140,6 @@ A single-file web application that transforms your LinkedIn connections export i
 - 🎭 **Unified dark theme**: Consistent `#1a1a2e` background across all views
 - 🔗 **Cross-view navigation**: Seamless modal popups for deep dives
 - 👤 **Standardized details**: Clean emoji-based info panels everywhere
-
----
-
-## 💡 Key Insights from My Network
-
-Using this tool, I discovered:
-- 📈 **Growth spurts**: Clear correlation between career moves and networking activity
-- 🏢 **Company clusters**: My network concentrates around 5-7 key companies
-- 📅 **Networking patterns**: I'm most active in Q1 and Q4
-- 🔗 **Connection strength**: Some companies have 50+ connections, others just 1-2
-
-**Most surprising?** Companies I worked at 10+ years ago still represent significant portions of my network.
 
 ---
 
@@ -164,7 +174,7 @@ I'm not a frontend expert. I've never built force-directed graphs before. Yet in
 
 ---
 
-## 🎓 What I Learned
+## 🎓 What I Learned (Using Vibe coding)
 
 1. **Your network tells a story**: Visualizing it reveals patterns you never noticed
 2. **AI as a pair programmer**: Works best when you know what you want but not exactly how to build it
@@ -211,7 +221,7 @@ I'm considering adding:
 
 ## 📝 Final Thoughts
 
-This started as curiosity about my network. It became an experiment in AI-assisted development. It ended up being one of the most insightful projects I've built.
+This started as curiosity about my network. It became an experiment in AI-assisted development. 
 
 **Three takeaways:**
 
@@ -229,11 +239,7 @@ This is what "AI-assisted development" really means in practice.
 
 ---
 
-**Want to try it yourself?** Drop a comment and I'll share the repository!
-
 **Have ideas for improvement?** Let me know what features would make this more valuable!
-
-**Built something similar with AI?** Share your experience—I'd love to hear how others are using AI as a development partner!
 
 ---
 
