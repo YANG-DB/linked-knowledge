@@ -147,17 +147,32 @@ A modern, interactive web application for visualizing and exploring your LinkedI
 
 ## 🚀 Quick Start
 
-### 1. Get Your LinkedIn Data
+### 1. Try with Sample Data (Optional)
+
+Want to see the visualizations immediately without your LinkedIn data?
+
+1. Open `index.html` in your browser
+2. Navigate to the **🔗 Network Graph** tab
+3. Click **⬇️ Sample CSV** to download sample connection data
+4. Click **📁 Load CSV** and select the downloaded file
+5. Explore the sample network!
+
+For the career timeline:
+1. Navigate to the **💼 Career Timeline** tab
+2. Click **⬇️ Sample Positions CSV** to download sample career data
+3. Click **📁 Load Career CSV** and select the downloaded file
+
+### 2. Get Your LinkedIn Data
 
 1. Go to [LinkedIn Settings & Privacy](https://www.linkedin.com/{user-name}/d/download-my-data)
 2. Click "Get a copy of your data"
 3. Select "Connections" only (faster download)
 4. Click "Request archive"
-5. Wait for LinkedIn to email you 
+5. Wait for LinkedIn to email you
 6. Download and extract the ZIP file
 7. Locate the `Connections.csv` file
 
-### 2. Run the Application
+### 3. Run the Application
 
 **Option A: Open directly in browser**
 ```bash
@@ -179,17 +194,18 @@ npx http-server
 # Then open http://localhost:8000
 ```
 
-### 3. Load Your Data
+### 4. Load Your Data
 
-1. Click the "📁 Load CSV" button
-2. Select your `Connections.csv` file
-3. Wait for the graph to load
-4. Explore your network!
+1. Navigate to the **🔗 Network Graph** tab
+2. Click **📁 Load CSV** button in the panel header
+3. Select your `Connections.csv` file
+4. Wait for the graph to load
+5. Explore your network!
 
-### 4. (Optional) Load Career Timeline
+### 5. (Optional) Load Career Timeline
 
-1. Click the "💼 Career Timeline" tab
-2. Click the "📁 Load Career CSV" button
+1. Click the **💼 Career Timeline** tab
+2. Click **📁 Load Career CSV** button in the panel header
 3. Select your positions CSV file (see format below)
 4. View your professional journey with LinkedIn connection counts
 

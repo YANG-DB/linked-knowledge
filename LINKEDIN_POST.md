@@ -140,14 +140,22 @@ A single-file web application that transforms your LinkedIn connections export i
 - 🎭 **Unified dark theme**: Consistent `#1a1a2e` background across all views
 - 🔗 **Cross-view navigation**: Seamless modal popups for deep dives
 - 👤 **Standardized details**: Clean emoji-based info panels everywhere
+- 📥 **Sample data included**: Download sample CSV files to try it instantly
 
 ---
 
 ## 🚀 How to Use It Yourself
 
+**Try it instantly with sample data:**
+1. **Open the HTML file** in your browser
+2. **Click "⬇️ Sample CSV"** in the Network Graph panel
+3. **Load the downloaded sample** and explore immediately!
+
+**Or use your own LinkedIn data:**
 1. **Export your LinkedIn data** (Settings → Get a copy of your data → Connections)
 2. **Open the HTML file** in any modern browser
-3. **Load your CSV** and explore!
+3. **Click "📁 Load CSV"** in the panel header and select your file
+4. **Explore your network!**
 
 **That's it.** No installation, no backend, no complexity.
 

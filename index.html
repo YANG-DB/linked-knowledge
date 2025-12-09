@@ -163,6 +163,7 @@
 
         .viz-panel.active {
             display: flex;
+            flex-direction: column;
             flex: 1;
         }
 
@@ -455,12 +456,8 @@
         <div class="header">
             <h1>🔗 LinkedIn Knowledge Graph Explorer</h1>
             <div class="controls">
-                <input type="file" id="csvFile" accept=".csv" style="display: none;">
-                <button class="btn" onclick="loadCSV()">📁 Load CSV</button>
-                <span id="connectionCount" style="background: white; padding: 8px 15px; border-radius: 20px; font-weight: 600; color: #0077b5; display: none;">0 connections</span>
                 <input type="text" id="searchBox" class="search-box" placeholder="🔍 Search connections..." oninput="handleSearch()">
                 <button class="btn btn-secondary" onclick="resetView()">🔄 Reset View</button>
-                <button class="btn btn-secondary" onclick="toggleSidebar()">ℹ️ Info Panel</button>
                 <button class="btn btn-success" onclick="exportGraph()">💾 Export Graph</button>
             </div>
         </div>
@@ -475,8 +472,22 @@
             </div>
             <div class="viz-content">
                 <div class="viz-panel active" id="graphPanel">
+                    <!-- Panel Header for CSV Loading -->
+                    <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid rgba(255,255,255,0.1);">
+                        <div style="display: flex; align-items: center; gap: 15px;">
+                            <h3 style="margin: 0; color: white; font-size: 18px; font-weight: 600;">🔗 Network Graph</h3>
+                            <span id="connectionCount" style="background: rgba(255, 255, 255, 0.2); padding: 6px 12px; border-radius: 15px; font-weight: 600; color: white; font-size: 13px; display: none;">0 connections</span>
+                        </div>
+                        <div style="display: flex; gap: 10px;">
+                            <input type="file" id="csvFile" accept=".csv" style="display: none;">
+                            <button class="btn" onclick="loadCSV()" style="background: white; color: #667eea; font-weight: 600;">📁 Load CSV</button>
+                            <button class="btn btn-secondary" onclick="downloadSampleConnections()" style="font-size: 13px; background: rgba(255,255,255,0.2); color: white; border: 1px solid rgba(255,255,255,0.3);">⬇️ Sample CSV</button>
+                        </div>
+                    </div>
+
                     <div class="graph-container">
-                        <div id="graphControls" style="text-align: center; padding: 20px;">
+                        <!-- Year Navigation Controls -->
+                        <div id="graphControls" style="text-align: center; padding: 15px 20px; border-bottom: 1px solid rgba(255,255,255,0.1);">
                             <button class="btn" onclick="changeGraphYear(-1)">← Previous Year</button>
                             <span id="graphYear" style="font-size: 20px; font-weight: bold; margin: 0 20px; color: white;">All Years</span>
                             <button class="btn" onclick="changeGraphYear(1)">Next Year →</button>
@@ -520,8 +531,16 @@
                     </div>
                 </div>
                 <div class="viz-panel" id="timelinePanel">
+                    <!-- Panel Header -->
+                    <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid rgba(255,255,255,0.1);">
+                        <div style="display: flex; align-items: center; gap: 15px;">
+                            <h3 style="margin: 0; color: white; font-size: 18px; font-weight: 600;">📈 Timeline Chart</h3>
+                            <span id="timelineConnectionCount" style="background: rgba(255, 255, 255, 0.2); padding: 6px 12px; border-radius: 15px; font-weight: 600; color: white; font-size: 13px; display: none;">0 connections</span>
+                        </div>
+                    </div>
+
                     <div class="graph-container">
-                        <div id="timelineControls" style="text-align: center; padding: 20px;">
+                        <div id="timelineControls" style="text-align: center; padding: 15px 20px; border-bottom: 1px solid rgba(255,255,255,0.1);">
                             <button class="btn" onclick="changeTimelineYear(-1)">← Previous Year</button>
                             <span id="timelineYear" style="font-size: 20px; font-weight: bold; margin: 0 20px; color: white;">All Years</span>
                             <button class="btn" onclick="changeTimelineYear(1)">Next Year →</button>
@@ -531,8 +550,16 @@
                     </div>
                 </div>
                 <div class="viz-panel" id="bubblePanel">
+                    <!-- Panel Header -->
+                    <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid rgba(255,255,255,0.1);">
+                        <div style="display: flex; align-items: center; gap: 15px;">
+                            <h3 style="margin: 0; color: white; font-size: 18px; font-weight: 600;">⚪ Bubble Chart</h3>
+                            <span id="bubbleConnectionCount" style="background: rgba(255, 255, 255, 0.2); padding: 6px 12px; border-radius: 15px; font-weight: 600; color: white; font-size: 13px; display: none;">0 connections</span>
+                        </div>
+                    </div>
+
                     <div class="graph-container">
-                        <div id="bubbleControls" style="text-align: center; padding: 20px;">
+                        <div id="bubbleControls" style="text-align: center; padding: 15px 20px; border-bottom: 1px solid rgba(255,255,255,0.1);">
                             <button class="btn" onclick="changeBubbleYear(-1)">← Previous Year</button>
                             <span id="bubbleYear" style="font-size: 20px; font-weight: bold; margin: 0 20px; color: white;">All Years</span>
                             <button class="btn" onclick="changeBubbleYear(1)">Next Year →</button>
@@ -542,8 +569,16 @@
                     </div>
                 </div>
                 <div class="viz-panel" id="calendarPanel">
+                    <!-- Panel Header -->
+                    <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid rgba(255,255,255,0.1);">
+                        <div style="display: flex; align-items: center; gap: 15px;">
+                            <h3 style="margin: 0; color: white; font-size: 18px; font-weight: 600;">📅 Calendar Heatmap</h3>
+                            <span id="calendarConnectionCount" style="background: rgba(255, 255, 255, 0.2); padding: 6px 12px; border-radius: 15px; font-weight: 600; color: white; font-size: 13px; display: none;">0 connections</span>
+                        </div>
+                    </div>
+
                     <div class="graph-container">
-                        <div id="calendarControls" style="text-align: center; padding: 20px;">
+                        <div id="calendarControls" style="text-align: center; padding: 15px 20px; border-bottom: 1px solid rgba(255,255,255,0.1);">
                             <button class="btn" onclick="changeCalendarYear(-1)">← Previous Year</button>
                             <span id="calendarYear" style="font-size: 20px; font-weight: bold; margin: 0 20px; color: white;">2024</span>
                             <button class="btn" onclick="changeCalendarYear(1)">Next Year →</button>
@@ -552,12 +587,20 @@
                     </div>
                 </div>
                 <div class="viz-panel" id="careerPanel">
-                    <div class="graph-container">
-                        <div id="careerControls" style="text-align: center; padding: 20px;">
-                            <input type="file" id="careerCsvFile" accept=".csv" style="display: none;">
-                            <button class="btn" onclick="loadCareerCSV()">📁 Load Career CSV</button>
-                            <span id="careerStatus" style="background: white; padding: 8px 15px; border-radius: 20px; font-weight: 600; color: #0077b5; margin-left: 15px; display: none;"></span>
+                    <!-- Panel Header -->
+                    <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid rgba(255,255,255,0.1);">
+                        <div style="display: flex; align-items: center; gap: 15px;">
+                            <h3 style="margin: 0; color: white; font-size: 18px; font-weight: 600;">💼 Career Timeline</h3>
+                            <span id="careerConnectionCount" style="background: rgba(255, 255, 255, 0.2); padding: 6px 12px; border-radius: 15px; font-weight: 600; color: white; font-size: 13px; display: none;">0 connections</span>
                         </div>
+                        <div style="display: flex; gap: 10px;">
+                            <input type="file" id="careerCsvFile" accept=".csv" style="display: none;">
+                            <button class="btn" onclick="loadCareerCSV()" style="background: white; color: #667eea; font-weight: 600;">📁 Load Career CSV</button>
+                            <button class="btn btn-secondary" onclick="downloadSamplePositions()" style="font-size: 13px; background: rgba(255,255,255,0.2); color: white; border: 1px solid rgba(255,255,255,0.3);">⬇️ Sample Positions CSV</button>
+                        </div>
+                    </div>
+
+                    <div class="graph-container">
                         <div id="careerTimeline" style="width: 100%; height: calc(100vh - 250px);"></div>
                     </div>
                 </div>
@@ -2977,7 +3020,7 @@
                 },
                 exportDate: new Date().toISOString()
             };
-            
+
             const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
@@ -2985,15 +3028,85 @@
             a.download = 'linkedin_connections_export.json';
             a.click();
             URL.revokeObjectURL(url);
-            
+
             showNotification('Graph exported successfully!', 'success');
+        }
+
+        async function downloadSampleConnections() {
+            try {
+                const response = await fetch('Connections.csv');
+                if (!response.ok) {
+                    throw new Error('Connections.csv file not found');
+                }
+                const csvData = await response.text();
+
+                const blob = new Blob([csvData], { type: 'text/csv' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'sample_connections.csv';
+                a.click();
+                URL.revokeObjectURL(url);
+
+                showNotification('Sample connections CSV downloaded!', 'success');
+            } catch (error) {
+                console.error('Error downloading Connections.csv:', error);
+                showNotification('Error: Connections.csv file not found. Please make sure it exists in the same folder.', 'error');
+            }
+        }
+
+        async function downloadSamplePositions() {
+            try {
+                const response = await fetch('Positions.csv');
+                if (!response.ok) {
+                    throw new Error('Positions.csv file not found');
+                }
+                const csvData = await response.text();
+
+                const blob = new Blob([csvData], { type: 'text/csv' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'sample_positions.csv';
+                a.click();
+                URL.revokeObjectURL(url);
+
+                showNotification('Sample positions CSV downloaded!', 'success');
+            } catch (error) {
+                console.error('Error downloading Positions.csv:', error);
+                showNotification('Error: Positions.csv file not found. Please make sure it exists in the same folder.', 'error');
+            }
         }
         
         function updateStats() {
-            // Update header count
-            const countEl = document.getElementById('connectionCount');
-            countEl.style.display = 'inline-block';
-            countEl.textContent = `${filteredData.length} connections`;
+            // Update all panel header counts
+            const count = filteredData.length;
+            const countText = `${count} connections`;
+
+            // Update Network Graph panel
+            const graphCountEl = document.getElementById('connectionCount');
+            graphCountEl.style.display = 'inline-block';
+            graphCountEl.textContent = countText;
+
+            // Update Timeline panel
+            const timelineCountEl = document.getElementById('timelineConnectionCount');
+            timelineCountEl.style.display = 'inline-block';
+            timelineCountEl.textContent = countText;
+
+            // Update Bubble Chart panel
+            const bubbleCountEl = document.getElementById('bubbleConnectionCount');
+            bubbleCountEl.style.display = 'inline-block';
+            bubbleCountEl.textContent = countText;
+
+            // Update Calendar panel
+            const calendarCountEl = document.getElementById('calendarConnectionCount');
+            calendarCountEl.style.display = 'inline-block';
+            calendarCountEl.textContent = countText;
+
+            // Update Career panel (shows total connections from allData)
+            const careerCountEl = document.getElementById('careerConnectionCount');
+            careerCountEl.style.display = 'inline-block';
+            careerCountEl.textContent = `${allData.length} connections`;
         }
         
         function showLoading(show) {
