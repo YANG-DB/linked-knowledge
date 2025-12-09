@@ -27,22 +27,27 @@ A modern, interactive web application for visualizing and exploring your LinkedI
 ## 🌟 Features
 
 ### Core Functionality
-- **📊 Interactive Network Graph**: Hierarchical visualization with you → companies → people
+- **📊 Interactive Network Graph**: Hierarchical visualization with you → companies → people (or professions)
 - **📈 Timeline Chart**: Stacked bar chart showing connection growth over time
 - **⚪ Bubble Chart**: Company distribution visualization by connection count
 - **📅 Calendar Heatmap**: GitHub-style daily activity visualization with year navigation
 - **💼 Career Timeline**: Professional journey visualization with position details and network statistics
 - **🔍 Smart Search**: Real-time search across names, companies, positions, and emails
-- **🎯 Company Filtering**: Multi-select company filter with color-coded legend
+- **🎯 Profession Grouping**: Optional 4-level hierarchy (You → Companies → Professions → People)
 - **📱 Responsive Design**: Works seamlessly on desktop and mobile devices
 - **💾 Batch Loading**: Gradual loading for large networks (network graph only)
+- **🔗 Cross-View Navigation**: Click companies in bubble chart or career timeline to view detailed network modal
 
 ### Visualization Options
-- **Hierarchical Network**: 3-level structure (You → Companies → Connections)
+- **Hierarchical Network**: 3 or 4-level structure (You → Companies → [Professions] → Connections)
   - Dynamic company node sizes based on employee count
-  - Color-coded by company with automatic palette
+  - **Profession Grouping**: Toggle to group connections by role within companies
+  - Color-coded by company with automatic palette (professions use lighter shades)
   - Click companies to highlight and filter
+  - **Delayed Hover Effect**: Hover over company for 3 seconds to fade other companies
+  - **Toggle Individual Connections**: Show/hide person nodes for performance
   - Synchronized highlighting across all views
+  - Advanced force-directed layout with strong radial positioning
 - **Zoomable Timeline**: Interactive stacked bar chart
   - Monthly aggregation of connections
   - Scroll to zoom in/out
@@ -52,11 +57,13 @@ A modern, interactive web application for visualizing and exploring your LinkedI
   - Size represents connection count per company
   - Zoom and pan support
   - Tooltip with detailed counts
+  - **Click to View Company Network**: Opens modal with detailed 3-level graph (Company → Professions → People)
 - **Calendar Heatmap**: Daily connection activity
   - GitHub-style heatmap grid (12 months x 7 days)
   - Color intensity shows connections per day
   - Navigate between years with arrow buttons
   - Hover tooltips with exact date and count
+  - **Click Day to View Connections**: Opens modal showing all connections made that day
   - Legend with gradient scale
 - **Career Timeline**: Professional positions visualization
   - AnyChart-powered timeline with horizontal bars for each position
@@ -66,15 +73,22 @@ A modern, interactive web application for visualizing and exploring your LinkedI
     - LinkedIn connection count per company (bottom box)
   - Company names displayed on timeline bars in white text
   - Color-coded by company matching network graph colors
+  - **Click Company Bar**: Opens modal with detailed company network graph
   - Scroll and zoom for detailed exploration
   - Loads from separate positions CSV file
   - Shows career progression chronologically
 
-### Network Statistics
-- Total connections count
-- Visible nodes after filtering
-- Number of unique companies
-- Real-time updates
+### User Interface
+- **Unified Dark Theme**: Consistent `#1a1a2e` background across all visualizations
+- **Clean Sidebars**: Minimalist connection details with emoji icons
+- **Modal Dialogs**: Beautiful purple gradient headers with smooth animations
+- **Connection Details Panel**: Standardized format showing:
+  - 👤 Name
+  - 🏢 Company
+  - 💼 Position
+  - 📧 Email (with mailto link)
+  - 📅 Connected On (formatted date)
+  - 🔗 LinkedIn Profile (with direct link)
 
 ## 📋 Requirements
 
@@ -230,14 +244,20 @@ const BATCH_SIZE = 100;  // Change this value (default: 100)
 - [x] Calendar heatmap for daily activity
 - [x] Professional career timeline with position details
 - [x] LinkedIn network statistics per company in career view
+- [x] **Profession grouping** in network graph (4-level hierarchy)
+- [x] **Company network modals** from bubble chart and career timeline
+- [x] **Calendar day connection viewer** - click days to see connections
+- [x] **Delayed hover highlighting** - 3-second hover to focus on company
+- [x] **Unified dark theme** across all visualizations
+- [x] **Standardized connection details** panels with emoji icons
+- [x] **Advanced force simulation** for clear layered positioning
 
 ### Planned Features
 - [ ] Connection strength indicators
 - [ ] Mutual connections detection
 - [ ] Industry clustering
 - [ ] Export as PNG/SVG
-- [ ] Dark mode toggle
-- [ ] Calendar click to filter connections by date
+- [ ] Filter connections by calendar date selection
 
 ### LinkedIn API Integration (Advanced)
 To fetch live LinkedIn data, you would need to:

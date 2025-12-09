@@ -190,104 +190,6 @@
             font-size: 20px;
         }
 
-        .company-filter-section {
-            margin-bottom: 20px;
-            padding: 15px;
-            background: #f8f9fa;
-            border-radius: 8px;
-        }
-
-        .company-filter-section h3 {
-            font-size: 16px;
-            color: #495057;
-            margin-bottom: 10px;
-        }
-
-        .company-list {
-            max-height: 300px;
-            overflow-y: auto;
-        }
-
-        .company-item {
-            display: flex;
-            align-items: center;
-            padding: 8px;
-            margin-bottom: 5px;
-            background: white;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-
-        .company-item:hover {
-            background: #e3f2fd;
-        }
-
-        .company-item input[type="checkbox"] {
-            margin-right: 10px;
-            cursor: pointer;
-        }
-
-        .company-icon {
-            width: 24px;
-            height: 24px;
-            border-radius: 4px;
-            margin-right: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 12px;
-            font-weight: bold;
-            color: white;
-            flex-shrink: 0;
-        }
-
-        .company-name {
-            flex: 1;
-            font-size: 13px;
-            color: #212529;
-        }
-
-        .company-count {
-            font-size: 11px;
-            color: #6c757d;
-            background: #e9ecef;
-            padding: 2px 8px;
-            border-radius: 10px;
-        }
-
-        .filter-actions {
-            display: flex;
-            gap: 5px;
-            margin-top: 10px;
-        }
-
-        .filter-btn {
-            padding: 5px 10px;
-            border: none;
-            border-radius: 5px;
-            font-size: 12px;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .filter-btn.select-all {
-            background: #28a745;
-            color: white;
-        }
-
-        .filter-btn.select-all:hover {
-            background: #218838;
-        }
-
-        .filter-btn.clear-all {
-            background: #dc3545;
-            color: white;
-        }
-
-        .filter-btn.clear-all:hover {
-            background: #c82333;
-        }
 
         .node-info {
             margin-bottom: 20px;
@@ -314,59 +216,6 @@
             word-break: break-word;
         }
 
-        .stats {
-            display: flex;
-            gap: 15px;
-            margin-top: 15px;
-            flex-wrap: wrap;
-        }
-
-        .stat-box {
-            background: #e3f2fd;
-            padding: 10px 15px;
-            border-radius: 8px;
-            text-align: center;
-            flex: 1;
-            min-width: 100px;
-        }
-
-        .stat-value {
-            font-size: 24px;
-            font-weight: bold;
-            color: #0077b5;
-        }
-
-        .stat-label {
-            font-size: 12px;
-            color: #6c757d;
-            margin-top: 5px;
-        }
-
-        .filter-section {
-            margin-top: 20px;
-            padding-top: 20px;
-            border-top: 2px solid #e9ecef;
-        }
-
-        .filter-group {
-            margin-bottom: 15px;
-        }
-
-        .filter-group label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: 500;
-            color: #495057;
-            font-size: 14px;
-        }
-
-        .filter-input {
-            width: 100%;
-            padding: 8px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            font-size: 14px;
-        }
 
         .loading {
             position: absolute;
@@ -433,6 +282,103 @@
             }
         }
 
+        /* Modal Dialog for Company Network */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 4000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .modal.show {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background-color: #fff;
+            border-radius: 12px;
+            width: 90%;
+            height: 85%;
+            max-width: 1400px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            display: flex;
+            flex-direction: column;
+            animation: slideUp 0.3s ease-out;
+        }
+
+        .modal-header {
+            padding: 20px 30px;
+            border-bottom: 2px solid #e9ecef;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 12px 12px 0 0;
+        }
+
+        .modal-header h2 {
+            margin: 0;
+            font-size: 24px;
+        }
+
+        .modal-close {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            font-size: 28px;
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .modal-close:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: rotate(90deg);
+        }
+
+        .modal-body {
+            flex: 1;
+            padding: 20px;
+            overflow: hidden;
+            position: relative;
+            background: #1a1a2e;
+        }
+
+        #companyNetworkGraph {
+            width: 100%;
+            height: 100%;
+            background: #1a1a2e;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
         .tooltip {
             position: absolute;
             background: rgba(0, 0, 0, 0.9);
@@ -443,6 +389,64 @@
             pointer-events: none;
             z-index: 1000;
             display: none;
+        }
+
+        /* Calendar Day Connection Cards */
+        .connection-card {
+            background: white;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+
+        .connection-card:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            transform: translateY(-2px);
+            border-color: #0077b5;
+        }
+
+        .connection-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 10px;
+        }
+
+        .connection-card-name {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .connection-card-company {
+            font-size: 14px;
+            color: #0077b5;
+            font-weight: 500;
+        }
+
+        .connection-card-position {
+            font-size: 13px;
+            color: #6c757d;
+            margin-top: 5px;
+        }
+
+        .connection-card-badge {
+            background: #0077b5;
+            color: white;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .connection-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 15px;
         }
     </style>
 </head>
@@ -503,6 +507,13 @@
                                     Show individual connections
                                 </label>
                             </div>
+                            <div>
+                                <label style="color: white; font-size: 13px; cursor: pointer; display: flex; align-items: center; gap: 5px;">
+                                    <input type="checkbox" id="groupByProfessionCheckbox" onchange="toggleGroupByProfession(this.checked)"
+                                           style="cursor: pointer; width: 16px; height: 16px;">
+                                    Group by profession
+                                </label>
+                            </div>
                         </div>
                         <svg id="graph"></svg>
                         <div class="tooltip" id="tooltip"></div>
@@ -555,47 +566,6 @@
                 <div id="nodeInfo">
                     <p style="color: #6c757d; font-size: 14px;">Click on a node to view details</p>
                 </div>
-                <div class="stats" id="stats" style="display: none;">
-                    <div class="stat-box">
-                        <div class="stat-value" id="displayedConnections">0</div>
-                        <div class="stat-label">Displayed (Graph)</div>
-                    </div>
-                    <div class="stat-box">
-                        <div class="stat-value" id="totalConnections">0</div>
-                        <div class="stat-label">Total (All Views)</div>
-                    </div>
-                </div>
-                
-                <div class="company-filter-section" id="companyFilterSection" style="display: none;">
-                    <h3>🏢 Filter by Company</h3>
-                    <div class="filter-actions">
-                        <button class="filter-btn select-all" onclick="selectAllCompanies()">Select All</button>
-                        <button class="filter-btn clear-all" onclick="clearAllCompanies()">Clear All</button>
-                    </div>
-                    <div style="margin: 10px 0; padding: 10px; background: white; border-radius: 5px;">
-                        <label style="display: flex; align-items: center; cursor: pointer; font-size: 13px;">
-                            <input type="checkbox" id="clusterToggle" onchange="toggleClustering(this.checked)" style="margin-right: 8px;">
-                            <span>🔗 Enable Company Clustering</span>
-                        </label>
-                    </div>
-                    <div class="company-list" id="companyList"></div>
-                </div>
-                
-                <div class="filter-section">
-                    <h2>Filters</h2>
-                    <div class="filter-group">
-                        <label>Company</label>
-                        <input type="text" id="filterCompany" class="filter-input" placeholder="Filter by company..." onkeyup="applyFilters()">
-                    </div>
-                    <div class="filter-group">
-                        <label>Position</label>
-                        <input type="text" id="filterPosition" class="filter-input" placeholder="Filter by position..." onkeyup="applyFilters()">
-                    </div>
-                    <div class="filter-group">
-                        <label>Connected Date</label>
-                        <input type="text" id="filterDate" class="filter-input" placeholder="Filter by date..." onkeyup="applyFilters()">
-                    </div>
-                </div>
             </div>
         </div>
 
@@ -605,6 +575,38 @@
         </div>
 
         <div class="notification" id="notification"></div>
+
+        <!-- Modal for Calendar Day Connections -->
+        <div id="calendarDayModal" class="modal">
+            <div class="modal-content" style="max-width: 900px; height: 70%;">
+                <div class="modal-header">
+                    <h2 id="calendarDayTitle">Connections</h2>
+                    <button class="modal-close" onclick="closeCalendarDayModal()">&times;</button>
+                </div>
+                <div class="modal-body" style="padding: 30px; overflow-y: auto; background: #f8f9fa;">
+                    <div id="calendarDayConnections"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal for Company Network Graph -->
+        <div id="companyModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 id="modalCompanyName">Company Network</h2>
+                    <button class="modal-close" onclick="closeCompanyModal()">&times;</button>
+                </div>
+                <div class="modal-body" style="display: flex; gap: 20px;">
+                    <div id="companyNetworkGraph" style="flex: 1;"></div>
+                    <div id="modalSidebar" style="width: 320px; background: rgba(255, 255, 255, 0.95); border-radius: 8px; padding: 20px; overflow-y: auto; box-shadow: -2px 0 10px rgba(0,0,0,0.3);">
+                        <h3 style="margin: 0 0 15px 0; color: #0077b5; font-size: 18px; font-weight: 600;">Connection Details</h3>
+                        <div id="modalNodeInfo">
+                            <p style="color: #6c757d; font-size: 14px; text-align: center; padding: 40px 20px;">Click on any person node to view their details</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -625,7 +627,10 @@
         let currentBubbleYear = currentYear; // Default to current year for faster loading
         let minCompanySize = 5; // Minimum number of connections per company to display
         let showMembers = true; // Show individual connections (default: true)
+        let groupByProfession = false; // Group connections by profession within companies
         let expandedCompanies = new Set(); // Track which companies are expanded when showMembers is false
+        let hoverTimeout = null; // Timeout for delayed hover effect
+        let hoveredCompany = null; // Currently hovered company
         
         // Initialize
         document.getElementById('csvFile').addEventListener('change', handleFileSelect);
@@ -675,51 +680,26 @@
         }
         
         function buildCompanyFilter() {
-            // Count connections per company
+            // Generate colors for each company
             const companyCounts = {};
             allData.forEach(conn => {
                 const company = conn.company || 'Unknown';
                 companyCounts[company] = (companyCounts[company] || 0) + 1;
             });
-            
-            // Sort companies by count (descending)
+
             const sortedCompanies = Object.entries(companyCounts)
                 .sort((a, b) => b[1] - a[1]);
-            
-            // Generate colors for each company
+
             const colors = [
-                '#0077b5', '#28a745', '#dc3545', '#ffc107', '#17a2b8', 
+                '#0077b5', '#28a745', '#dc3545', '#ffc107', '#17a2b8',
                 '#6f42c1', '#fd7e14', '#20c997', '#e83e8c', '#6c757d',
                 '#007bff', '#28a745', '#ffc107', '#dc3545', '#17a2b8'
             ];
-            
+
             sortedCompanies.forEach(([company], index) => {
                 companyColors[company] = colors[index % colors.length];
                 selectedCompanies.add(company); // All selected by default
             });
-            
-            // Build HTML
-            const companyListHtml = sortedCompanies.map(([company, count]) => {
-                const initial = company.charAt(0).toUpperCase();
-                const color = companyColors[company];
-                
-                return `
-                    <div class="company-item" onclick="toggleCompany('${escapeHtml(company)}')">
-                        <input type="checkbox" 
-                               id="company_${escapeHtml(company)}" 
-                               checked 
-                               onchange="handleCompanyCheckbox('${escapeHtml(company)}', event)">
-                        <div class="company-icon" style="background: ${color};">
-                            ${initial}
-                        </div>
-                        <div class="company-name">${escapeHtml(company)}</div>
-                        <div class="company-count">${count}</div>
-                    </div>
-                `;
-            }).join('');
-            
-            document.getElementById('companyList').innerHTML = companyListHtml;
-            document.getElementById('companyFilterSection').style.display = 'block';
         }
         
         function escapeHtml(text) {
@@ -757,24 +737,6 @@
             applyCompanyFilter();
         }
         
-        function selectAllCompanies() {
-            selectedCompanies.clear();
-            Object.keys(companyColors).forEach(company => {
-                selectedCompanies.add(company);
-                const checkbox = document.getElementById(`company_${company}`);
-                if (checkbox) checkbox.checked = true;
-            });
-            applyCompanyFilter();
-        }
-        
-        function clearAllCompanies() {
-            selectedCompanies.clear();
-            Object.keys(companyColors).forEach(company => {
-                const checkbox = document.getElementById(`company_${company}`);
-                if (checkbox) checkbox.checked = false;
-            });
-            applyCompanyFilter();
-        }
         
         function applyCompanyFilter() {
             console.log('=== APPLYING COMPANY FILTER ===');
@@ -942,7 +904,7 @@
                 companiesMap.get(company).push(d);
             });
 
-            // Create hierarchical structure: You -> Companies -> People (or just You -> Companies if showMembers is false)
+            // Create hierarchical structure: You -> Companies -> Professions (optional) -> People
             const root = {
                 id: 'central',
                 name: 'You',
@@ -951,20 +913,56 @@
                     // Show members if: global showMembers is true OR this specific company is expanded
                     const shouldShowMembers = showMembers || expandedCompanies.has(companyName);
 
-                    return {
-                        id: `company_${companyName}`,
-                        name: companyName,
-                        type: 'company',
-                        company: companyName,
-                        employeeCount: employees.length, // Store count for tooltip even when not showing members
-                        isExpanded: expandedCompanies.has(companyName), // Track expansion state
-                        children: shouldShowMembers ? employees.map(d => ({
+                    let children = [];
+
+                    if (groupByProfession) {
+                        // Always show professions when grouping is enabled
+                        // Group employees by profession
+                        const professionMap = new Map();
+                        employees.forEach(emp => {
+                            const profession = emp.position || 'Unknown Position';
+                            if (!professionMap.has(profession)) {
+                                professionMap.set(profession, []);
+                            }
+                            professionMap.get(profession).push(emp);
+                        });
+
+                        // Create profession nodes with optional people as children
+                        children = Array.from(professionMap.entries()).map(([professionName, people]) => ({
+                            id: `profession_${companyName}_${professionName}`,
+                            name: professionName,
+                            type: 'profession',
+                            company: companyName,
+                            employeeCount: people.length,
+                            // Only show people if shouldShowMembers is true
+                            children: shouldShowMembers ? people.map(d => ({
+                                id: d.id,
+                                name: d.fullName,
+                                type: 'person',
+                                data: d,
+                                company: companyName,
+                                profession: professionName
+                            })) : []
+                        }));
+                    } else if (shouldShowMembers) {
+                        // Direct children without profession grouping (only when shouldShowMembers)
+                        children = employees.map(d => ({
                             id: d.id,
                             name: d.fullName,
                             type: 'person',
                             data: d,
                             company: companyName
-                        })) : [] // Empty children array when not showing members
+                        }));
+                    }
+
+                    return {
+                        id: `company_${companyName}`,
+                        name: companyName,
+                        type: 'company',
+                        company: companyName,
+                        employeeCount: employees.length,
+                        isExpanded: expandedCompanies.has(companyName),
+                        children: children
                     };
                 })
             };
@@ -987,37 +985,50 @@
                 .domain([minCompanySizeValue, maxCompanySize])
                 .range([10, 30]);
 
-            // Create force simulation for tree layout with 3 levels
+            // Create force simulation for tree layout with up to 4 levels (with profession grouping)
             simulation = d3.forceSimulation(nodes)
                 .force('link', d3.forceLink(links)
                     .id(d => d.id)
                     .distance(d => {
-                        // Longer distances for more spread
-                        return d.source.depth === 0 ? 180 : 80;
+                        // Adjust distances based on depth and grouping mode
+                        if (d.source.depth === 0) return 200;  // You -> Company
+                        if (d.source.depth === 1) return groupByProfession ? 180 : 80;  // Company -> Profession
+                        if (d.source.depth === 2 && d.source.data.type === 'profession') return 100;  // Profession -> Person
+                        return 80;  // Company -> Person (without profession grouping)
                     })
-                    .strength(0.3))  // Reduced from 0.7 to 0.3 for looser connections
+                    .strength(d => {
+                        // Stronger links for higher levels
+                        if (d.source.depth === 0) return 0.7;  // You -> Company
+                        if (d.source.depth === 1) return groupByProfession ? 0.6 : 0.5;  // Company -> Profession or Person
+                        if (d.source.depth === 2 && d.source.data.type === 'profession') return 0.5;  // Profession -> Person
+                        return 0.3;
+                    }))
                 .force('charge', d3.forceManyBody().strength(d => {
-                    // Stronger repulsion for all nodes to spread them apart
-                    if (d.depth === 0) return -1000;  // You - strong repulsion
-                    if (d.depth === 1) return -800;   // Companies - strong repulsion
-                    return -100;                       // People - moderate repulsion
+                    // Stronger repulsion for profession grouping to prevent overlapping
+                    if (d.depth === 0) return -2000;  // You - very strong repulsion
+                    if (d.depth === 1) return groupByProfession ? -1500 : -1000;   // Companies - stronger when grouping
+                    if (d.depth === 2 && d.data.type === 'profession') return -600;  // Professions - strong repulsion
+                    return groupByProfession ? -150 : -100;  // People - stronger when grouped
                 }))
                 .force('center', d3.forceCenter(width / 2, height / 2))
                 .force('collision', d3.forceCollide().radius(d => {
-                    // Dynamic collision radius based on node size
-                    if (d.depth === 0) return 30;
+                    // Dynamic collision radius based on node size with more spacing
+                    if (d.depth === 0) return 35;
                     if (d.depth === 1) {
                         const employeeCount = showMembers ? (d.children ? d.children.length : 0) : (d.data.employeeCount || 0);
-                        return radiusScale(employeeCount) + 15;  // Add padding
+                        return radiusScale(employeeCount) + (groupByProfession ? 25 : 15);
                     }
-                    return 15;
-                }))
+                    if (d.depth === 2 && d.data.type === 'profession') return 25;  // Profession nodes - more space
+                    return groupByProfession ? 18 : 15;  // Person nodes - more space when grouped
+                }).strength(1.2))
                 .force('radial', d3.forceRadial(d => {
-                    // Increased radii for more spread
-                    if (d.depth === 0) return 0;
-                    if (d.depth === 1) return 280;  // Companies further out
-                    return 450;                      // People even further out
-                }, width / 2, height / 2).strength(0.4));  // Reduced from 0.5 to 0.4
+                    // Stronger radial positioning for clear layers
+                    if (d.depth === 0) return 0;  // You at center
+                    if (d.depth === 1) return groupByProfession ? 300 : 280;  // Companies - further when grouping
+                    if (d.depth === 2 && d.data.type === 'profession') return 500;  // Professions in middle layer
+                    if (groupByProfession && d.depth === 3) return 680;  // People outermost layer when grouped
+                    return 450;  // People (without profession grouping)
+                }, width / 2, height / 2).strength(groupByProfession ? 0.8 : 0.5));
             
             // Create links
             link = g.append('g')
@@ -1040,6 +1051,7 @@
                         const employeeCount = showMembers ? (d.children ? d.children.length : 0) : (d.data.employeeCount || 0);
                         return radiusScale(employeeCount);
                     }
+                    if (d.depth === 2 && d.data.type === 'profession') return 12;  // Profession nodes - medium
                     return 6;                           // Person nodes - smallest
                 })
                 .attr('fill', d => {
@@ -1049,10 +1061,15 @@
                         const company = d.data.company || 'Unknown';
                         return companyColors[company] || '#28a745';
                     }
-                    // Person nodes - lighter version of company color
+                    if (d.depth === 2 && d.data.type === 'profession') {
+                        // Profession nodes - medium shade of company color
+                        const company = d.data?.company || 'Unknown';
+                        const color = companyColors[company] || '#28a745';
+                        return d3.color(color).brighter(0.2);
+                    }
+                    // Person nodes - lightest version of company color
                     const company = d.data?.company || 'Unknown';
                     const color = companyColors[company] || '#28a745';
-                    // Lighten the color for person nodes
                     return d3.color(color).brighter(0.5);
                 })
                 .attr('stroke', d => {
@@ -1061,6 +1078,7 @@
                         // Show expanded companies with gold border when members are hidden
                         return (!showMembers && d.data.isExpanded) ? '#ffc107' : '#fff';
                     }
+                    if (d.depth === 2 && d.data.type === 'profession') return '#fff';
                     return '#ddd';
                 })
                 .attr('stroke-width', d => {
@@ -1093,8 +1111,20 @@
                             // If members are shown, just toggle highlight
                             handleCompanyHighlight(d);
                         }
-                    } else if (d.depth === 2) {
-                        // Person node clicked
+                    } else if (d.depth === 2 && d.data.type === 'profession') {
+                        // Profession node clicked
+                        if (!showMembers && d.children && d.children.length === 0) {
+                            // If members are hidden, expand this profession to show its people
+                            const companyName = d.data.company;
+                            expandedCompanies.add(companyName);
+                            showNotification(`Expanding ${d.data.name} (${d.data.employeeCount} connections)`, 'success');
+                            applyYearFilterAndRebuild();
+                        } else {
+                            // Otherwise just show info
+                            showNotification(`${d.data.name}: ${d.data.employeeCount} connections`, 'info');
+                        }
+                    } else if (d.depth === 2 || d.depth === 3) {
+                        // Person node clicked (depth 2 when no profession grouping, depth 3 when grouped)
                         handleNodeClick({
                             id: d.data.id,
                             name: d.data.name,
@@ -1114,10 +1144,97 @@
                         // Show company name and count (use employeeCount when members are hidden)
                         const count = showMembers ? (d.children ? d.children.length : 0) : (d.data.employeeCount || 0);
                         tooltipData.name = `${d.data.name} (${count} connections)`;
+
+                        // Set up delayed hover effect for company nodes
+                        const companyName = d.data.company;
+                        hoveredCompany = companyName;
+
+                        // Clear any existing timeout
+                        if (hoverTimeout) {
+                            clearTimeout(hoverTimeout);
+                        }
+
+                        // Set new timeout for 3 seconds
+                        hoverTimeout = setTimeout(() => {
+                            // Fade out nodes that don't belong to the hovered company
+                            node.transition()
+                                .duration(300)
+                                .attr('opacity', n => {
+                                    // Keep "You" node (depth 0) fully visible
+                                    if (n.depth === 0) return 1;
+
+                                    // Get the company for this node
+                                    const nodeCompany = n.data.company;
+
+                                    // Fade out if not part of hovered company
+                                    if (nodeCompany !== companyName) {
+                                        return 0.2;
+                                    }
+                                    return 1;
+                                });
+
+                            text.transition()
+                                .duration(300)
+                                .attr('opacity', n => {
+                                    // Keep "You" label fully visible
+                                    if (n.depth === 0) return 1;
+
+                                    // Get the company for this node
+                                    const nodeCompany = n.data.company;
+
+                                    // Fade out labels if not part of hovered company
+                                    if (nodeCompany !== companyName) {
+                                        return 0.2;
+                                    }
+                                    return 1;
+                                });
+
+                            link.transition()
+                                .duration(300)
+                                .attr('opacity', l => {
+                                    // Get company from source or target
+                                    const linkCompany = l.source.data.company || l.target.data.company;
+
+                                    // Fade links that don't belong to the hovered company
+                                    if (linkCompany !== companyName) {
+                                        return 0.1;
+                                    }
+                                    return 0.6;
+                                });
+                        }, 3000); // 3 seconds delay
+                    } else if (d.depth === 2 && d.data.type === 'profession') {
+                        // Show profession name and count
+                        const count = d.data.employeeCount || 0;
+                        tooltipData.name = `${d.data.name} (${count} connections)`;
                     }
                     showTooltip(event, tooltipData);
                 })
-                .on('mouseout', hideTooltip);
+                .on('mouseout', (event, d) => {
+                    hideTooltip();
+
+                    // Clear hover timeout if mouse leaves before 3 seconds
+                    if (hoverTimeout) {
+                        clearTimeout(hoverTimeout);
+                        hoverTimeout = null;
+                    }
+
+                    // Reset opacity for all nodes if we were in hover state
+                    if (d.depth === 1 && hoveredCompany) {
+                        hoveredCompany = null;
+
+                        node.transition()
+                            .duration(300)
+                            .attr('opacity', 1);
+
+                        text.transition()
+                            .duration(300)
+                            .attr('opacity', 1);
+
+                        link.transition()
+                            .duration(300)
+                            .attr('opacity', 0.6);
+                    }
+                });
 
             // Create labels with different sizes
             text = g.append('g')
@@ -1131,15 +1248,30 @@
                         const count = showMembers ? (d.children ? d.children.length : 0) : (d.data.employeeCount || 0);
                         return `${name} (${count})`;
                     }
+                    if (d.depth === 2 && d.data.type === 'profession') {
+                        // Show profession name with count (use employeeCount to show total even when people are hidden)
+                        const count = d.data.employeeCount || 0;
+                        return `${name} (${count})`;
+                    }
                     return name.length > 15 ? name.substring(0, 15) + '...' : name;
                 })
                 .attr('font-size', d => {
                     if (d.depth === 0) return 16;  // You - largest text
                     if (d.depth === 1) return 11;  // Company - medium text
+                    if (d.depth === 2 && d.data.type === 'profession') return 9;  // Profession - small-medium text
                     return 8;                       // Person - smallest text
                 })
-                .attr('font-weight', d => d.depth <= 1 ? 'bold' : 'normal')
-                .attr('dx', d => d.depth === 0 ? 0 : (d.depth === 1 ? 18 : 10))
+                .attr('font-weight', d => {
+                    if (d.depth <= 1) return 'bold';
+                    if (d.depth === 2 && d.data.type === 'profession') return '600';  // Semi-bold for professions
+                    return 'normal';
+                })
+                .attr('dx', d => {
+                    if (d.depth === 0) return 0;
+                    if (d.depth === 1) return 18;
+                    if (d.depth === 2 && d.data.type === 'profession') return 15;  // Profession offset
+                    return 10;
+                })
                 .attr('dy', d => d.depth === 0 ? -30 : 4)
                 .attr('text-anchor', d => d.depth === 0 ? 'middle' : 'start')
                 .attr('fill', '#fff')
@@ -1819,7 +1951,7 @@
                         .html(`
                             <strong>${d.data.name}</strong><br/>
                             <span style="color: ${companyColors[d.data.name]};">●</span> ${d.value} connections<br/>
-                            <span style="font-size: 10px; color: #aaa;">Click to filter</span>
+                            <span style="font-size: 10px; color: #aaa;">Click to view network graph</span>
                         `)
                         .style('left', (event.pageX + 15) + 'px')
                         .style('top', (event.pageY - 15) + 'px')
@@ -1835,13 +1967,9 @@
                     tooltip.style('opacity', 0);
                 })
                 .on('click', function(event, d) {
-                    // Toggle company selection
+                    // Open company network modal
                     const company = d.data.name;
-                    const checkbox = document.getElementById(`company_${company}`);
-                    if (checkbox) {
-                        checkbox.checked = !checkbox.checked;
-                        handleCompanyCheckbox(company, checkbox.checked);
-                    }
+                    openCompanyModal(company);
                 });
             
             // Add text labels
@@ -1996,6 +2124,388 @@
                 showNotification('Showing companies only - click a company to expand it', 'success');
             }
             applyYearFilterAndRebuild();
+        }
+
+        function toggleGroupByProfession(checked) {
+            groupByProfession = checked;
+            if (checked) {
+                showNotification('Grouping connections by profession within companies', 'success');
+            } else {
+                showNotification('Profession grouping disabled', 'success');
+            }
+            applyYearFilterAndRebuild();
+        }
+
+        // Company Modal Functions
+        function openCompanyModal(companyName) {
+            // Filter data for this company
+            const companyData = allData.filter(d => d.company === companyName);
+
+            if (companyData.length === 0) {
+                showNotification('No data found for ' + companyName, 'error');
+                return;
+            }
+
+            // Update modal title
+            document.getElementById('modalCompanyName').textContent = `${companyName} Network (${companyData.length} connections)`;
+
+            // Show modal
+            document.getElementById('companyModal').classList.add('show');
+
+            // Build the company network graph
+            setTimeout(() => buildCompanyNetworkGraph(companyName, companyData), 100);
+        }
+
+        function closeCompanyModal() {
+            document.getElementById('companyModal').classList.remove('show');
+            // Clear the graph
+            d3.select('#companyNetworkGraph').selectAll('*').remove();
+            // Reset sidebar to default message
+            document.getElementById('modalNodeInfo').innerHTML = '<p style="color: #6c757d; font-size: 14px; text-align: center; padding: 40px 20px;">Click on any person node to view their details</p>';
+        }
+
+        // Close modal when clicking outside
+        document.getElementById('companyModal').addEventListener('click', function(event) {
+            if (event.target === this) {
+                closeCompanyModal();
+            }
+        });
+
+        // Close modal on Escape key
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                closeCompanyModal();
+            }
+        });
+
+        function buildCompanyNetworkGraph(companyName, companyData) {
+            const container = document.getElementById('companyNetworkGraph');
+            const width = container.clientWidth;
+            const height = container.clientHeight;
+
+            // Clear existing
+            d3.select('#companyNetworkGraph').selectAll('*').remove();
+
+            // Create SVG
+            const svg = d3.select('#companyNetworkGraph')
+                .append('svg')
+                .attr('width', width)
+                .attr('height', height);
+
+            const g = svg.append('g');
+
+            // Add zoom
+            const zoom = d3.zoom()
+                .scaleExtent([0.1, 4])
+                .on('zoom', (event) => {
+                    g.attr('transform', event.transform);
+                });
+
+            svg.call(zoom);
+
+            // Group by profession if enabled
+            const professionMap = new Map();
+            companyData.forEach(person => {
+                const profession = person.position || 'Unknown Position';
+                if (!professionMap.has(profession)) {
+                    professionMap.set(profession, []);
+                }
+                professionMap.get(profession).push(person);
+            });
+
+            // Create hierarchical structure: Company -> Professions -> People
+            const root = {
+                id: 'company_root',
+                name: companyName,
+                type: 'company',
+                children: Array.from(professionMap.entries()).map(([professionName, people]) => ({
+                    id: `profession_${professionName}`,
+                    name: professionName,
+                    type: 'profession',
+                    employeeCount: people.length,
+                    children: people.map(p => ({
+                        id: p.id,
+                        name: p.fullName,
+                        type: 'person',
+                        data: p
+                    }))
+                }))
+            };
+
+            // Convert to D3 hierarchy
+            const hierarchy = d3.hierarchy(root);
+            const links = hierarchy.links();
+            const nodes = hierarchy.descendants();
+
+            // Create force simulation
+            const simulation = d3.forceSimulation(nodes)
+                .force('link', d3.forceLink(links)
+                    .id(d => d.id)
+                    .distance(d => {
+                        if (d.source.depth === 0) return 150; // Company -> Profession
+                        return 80; // Profession -> Person
+                    })
+                    .strength(0.5))
+                .force('charge', d3.forceManyBody().strength(d => {
+                    if (d.depth === 0) return -1000; // Company
+                    if (d.depth === 1) return -300;  // Professions
+                    return -50; // People
+                }))
+                .force('center', d3.forceCenter(width / 2, height / 2))
+                .force('collision', d3.forceCollide().radius(d => {
+                    if (d.depth === 0) return 40;
+                    if (d.depth === 1) return 25;
+                    return 15;
+                }));
+
+            // Create links
+            const link = g.append('g')
+                .selectAll('line')
+                .data(links)
+                .join('line')
+                .attr('stroke', '#999')
+                .attr('stroke-opacity', 0.6)
+                .attr('stroke-width', 1.5);
+
+            // Create nodes
+            const node = g.append('g')
+                .selectAll('circle')
+                .data(nodes)
+                .join('circle')
+                .attr('r', d => {
+                    if (d.depth === 0) return 30;  // Company
+                    if (d.depth === 1) return 15;  // Profession
+                    return 8;  // Person
+                })
+                .attr('fill', d => {
+                    const color = companyColors[companyName] || '#28a745';
+                    if (d.depth === 0) return color;
+                    if (d.depth === 1) return d3.color(color).brighter(0.3);
+                    return d3.color(color).brighter(0.6);
+                })
+                .attr('stroke', '#fff')
+                .attr('stroke-width', 2)
+                .style('cursor', 'pointer')
+                .call(d3.drag()
+                    .on('start', dragstarted)
+                    .on('drag', dragged)
+                    .on('end', dragended))
+                .on('click', (event, d) => {
+                    console.log('Node clicked - depth:', d.depth, 'data:', d.data);
+
+                    // Highlight the clicked node
+                    node.attr('stroke-width', n => n === d ? 4 : 2);
+
+                    if (d.depth === 2) {
+                        // Show person details in sidebar
+                        console.log('Person node clicked (depth 2)');
+                        console.log('Full node data:', JSON.stringify(d.data, null, 2));
+
+                        // The person data is stored in d.data.data
+                        const personData = d.data.data;
+                        const professionName = d.parent ? d.parent.data.name : 'Unknown';
+
+                        if (personData) {
+                            console.log('Calling showModalPersonDetails with:', personData);
+                            showModalPersonDetails(personData, professionName);
+                        } else {
+                            console.error('No person data found at d.data.data');
+                            showNotification('Unable to load person details', 'error');
+                        }
+                    } else if (d.depth === 1) {
+                        console.log('Profession node clicked:', d.data.name, `(${d.data.employeeCount} people)`);
+                    } else if (d.depth === 0) {
+                        console.log('Company node clicked:', d.data.name);
+                    }
+                });
+
+            // Create labels
+            const text = g.append('g')
+                .selectAll('text')
+                .data(nodes)
+                .join('text')
+                .text(d => {
+                    if (d.depth === 0) return d.data.name;
+                    if (d.depth === 1) return `${d.data.name} (${d.data.employeeCount})`;
+                    return d.data.name.length > 15 ? d.data.name.substring(0, 15) + '...' : d.data.name;
+                })
+                .attr('font-size', d => {
+                    if (d.depth === 0) return 14;
+                    if (d.depth === 1) return 10;
+                    return 8;
+                })
+                .attr('font-weight', d => d.depth <= 1 ? 'bold' : 'normal')
+                .attr('dx', d => d.depth === 0 ? 0 : 12)
+                .attr('dy', d => d.depth === 0 ? -35 : 4)
+                .attr('text-anchor', d => d.depth === 0 ? 'middle' : 'start')
+                .attr('fill', '#333')
+                .style('pointer-events', 'none');
+
+            // Update positions on tick
+            simulation.on('tick', () => {
+                link
+                    .attr('x1', d => d.source.x)
+                    .attr('y1', d => d.source.y)
+                    .attr('x2', d => d.target.x)
+                    .attr('y2', d => d.target.y);
+
+                node
+                    .attr('cx', d => d.x)
+                    .attr('cy', d => d.y);
+
+                text
+                    .attr('x', d => d.x)
+                    .attr('y', d => d.y);
+            });
+
+            function dragstarted(event, d) {
+                if (!event.active) simulation.alphaTarget(0.3).restart();
+                d.fx = d.x;
+                d.fy = d.y;
+            }
+
+            function dragged(event, d) {
+                d.fx = event.x;
+                d.fy = event.y;
+            }
+
+            function dragended(event, d) {
+                if (!event.active) simulation.alphaTarget(0);
+                d.fx = null;
+                d.fy = null;
+            }
+        }
+
+        // Calendar Day Modal Functions
+        function openCalendarDayModal(date, connections) {
+            const formattedDate = date.toLocaleDateString('en-US', {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+
+            // Update modal title
+            document.getElementById('calendarDayTitle').textContent = `${connections.length} Connection${connections.length !== 1 ? 's' : ''} on ${formattedDate}`;
+
+            // Build connections grid
+            const container = document.getElementById('calendarDayConnections');
+
+            let html = '<div class="connection-grid">';
+
+            connections.forEach(person => {
+                const companyColor = companyColors[person.company] || '#28a745';
+
+                html += `
+                    <div class="connection-card" onclick="showCalendarDayPersonDetails(${JSON.stringify(person).replace(/"/g, '&quot;')})">
+                        <div class="connection-card-header">
+                            <div>
+                                <div class="connection-card-name">${person.fullName || 'Unknown'}</div>
+                                <div class="connection-card-company" style="color: ${companyColor};">${person.company || 'N/A'}</div>
+                            </div>
+                            <div class="connection-card-badge" style="background: ${companyColor};">View</div>
+                        </div>
+                        <div class="connection-card-position">${person.position || 'No position listed'}</div>
+                    </div>
+                `;
+            });
+
+            html += '</div>';
+
+            container.innerHTML = html;
+
+            // Show modal
+            document.getElementById('calendarDayModal').classList.add('show');
+        }
+
+        function closeCalendarDayModal() {
+            document.getElementById('calendarDayModal').classList.remove('show');
+            document.getElementById('calendarDayConnections').innerHTML = '';
+        }
+
+        function showCalendarDayPersonDetails(person) {
+            // Close the calendar day modal
+            closeCalendarDayModal();
+
+            // Show person details in main sidebar
+            handleNodeClick({
+                id: person.id,
+                name: person.fullName,
+                type: 'person',
+                data: person
+            });
+
+            // Switch to graph view to show the sidebar
+            if (currentViz !== 'graph') {
+                document.querySelector('.viz-tab[onclick*="graph"]').click();
+            }
+        }
+
+        // Close calendar day modal when clicking outside
+        document.getElementById('calendarDayModal').addEventListener('click', function(event) {
+            if (event.target === this) {
+                closeCalendarDayModal();
+            }
+        });
+
+        function showModalPersonDetails(person, professionName) {
+            const nodeInfo = document.getElementById('modalNodeInfo');
+
+            console.log('showModalPersonDetails called with:', { person, professionName });
+
+            if (!person) {
+                console.error('Person data is null or undefined');
+                nodeInfo.innerHTML = '<p style="color: #dc3545; text-align: center; padding: 20px;">Unable to load person details</p>';
+                return;
+            }
+
+            // Build the info HTML (similar to main sidebar but without company filter)
+            let html = '';
+
+            html += `<div class="info-item">
+                <strong style="color: #0077b5;">👤 Name</strong><br/>
+                <span style="font-size: 16px;">${person.fullName || 'N/A'}</span>
+            </div>`;
+
+            html += `<div class="info-item">
+                <strong style="color: #0077b5;">🏢 Company</strong><br/>
+                <span>${person.company || 'N/A'}</span>
+            </div>`;
+
+            html += `<div class="info-item">
+                <strong style="color: #0077b5;">💼 Position</strong><br/>
+                <span>${professionName || person.position || 'N/A'}</span>
+            </div>`;
+
+            if (person.email) {
+                html += `<div class="info-item">
+                    <strong style="color: #0077b5;">📧 Email</strong><br/>
+                    <a href="mailto:${person.email}" style="color: #0077b5; text-decoration: none;">${person.email}</a>
+                </div>`;
+            }
+
+            if (person.connectedOn) {
+                const date = new Date(person.connectedOn);
+                const formattedDate = date.toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                });
+                html += `<div class="info-item">
+                    <strong style="color: #0077b5;">📅 Connected On</strong><br/>
+                    <span>${formattedDate}</span>
+                </div>`;
+            }
+
+            if (person.url) {
+                html += `<div class="info-item">
+                    <strong style="color: #0077b5;">🔗 LinkedIn Profile</strong><br/>
+                    <a href="${person.url}" target="_blank" style="color: #0077b5; text-decoration: none;">View Profile →</a>
+                </div>`;
+            }
+
+            nodeInfo.innerHTML = html;
+            console.log('Person details displayed successfully');
         }
 
         // Calendar navigation functions
@@ -2175,6 +2685,20 @@
                             .attr('stroke-width', 0.5);
 
                         tooltip.style('opacity', 0);
+                    })
+                    .on('click', function(event, d) {
+                        const dateStr = d.toISOString().split('T')[0];
+                        const count = dateMap.get(dateStr) || 0;
+
+                        if (count > 0) {
+                            // Find all connections for this day
+                            const dayConnections = data.filter(conn => {
+                                const connDate = new Date(conn.connectedOn);
+                                return connDate.toISOString().split('T')[0] === dateStr;
+                            });
+
+                            openCalendarDayModal(d, dayConnections);
+                        }
                     });
 
                 // Add day of week labels (on the left side)
@@ -2325,61 +2849,66 @@
             
             if (nodeData.type === 'central') {
                 document.getElementById('nodeInfo').innerHTML = `
-                    <div class="node-info">
-                        <div class="info-item">
-                            <div class="info-label">Name</div>
-                            <div class="info-value">You (Central Node)</div>
-                        </div>
-                        <div class="info-item">
-                            <div class="info-label">Total Connections</div>
-                            <div class="info-value">${allData.length}</div>
-                        </div>
+                    <div class="info-item">
+                        <strong style="color: #0077b5;">👤 Name</strong><br/>
+                        <span style="font-size: 16px;">You (Central Node)</span>
+                    </div>
+                    <div class="info-item">
+                        <strong style="color: #0077b5;">📊 Total Connections</strong><br/>
+                        <span style="font-size: 16px;">${allData.length}</span>
                     </div>
                 `;
             } else {
                 const data = nodeData.data;
-                document.getElementById('nodeInfo').innerHTML = `
-                    <div class="node-info">
-                        <div class="info-item">
-                            <div class="info-label">Name</div>
-                            <div class="info-value">${data.fullName}</div>
-                        </div>
-                        ${data.company ? `
-                        <div class="info-item">
-                            <div class="info-label">Company</div>
-                            <div class="info-value">${data.company}</div>
-                        </div>
-                        ` : ''}
-                        ${data.position ? `
-                        <div class="info-item">
-                            <div class="info-label">Position</div>
-                            <div class="info-value">${data.position}</div>
-                        </div>
-                        ` : ''}
-                        ${data.email ? `
-                        <div class="info-item">
-                            <div class="info-label">Email</div>
-                            <div class="info-value">${data.email}</div>
-                        </div>
-                        ` : ''}
-                        ${data.url ? `
-                        <div class="info-item">
-                            <div class="info-label">LinkedIn Profile</div>
-                            <div class="info-value">
-                                <a href="${data.url}" target="_blank" style="color: #0077b5; text-decoration: none;">
-                                    View Profile
-                                </a>
-                            </div>
-                        </div>
-                        ` : ''}
-                        ${data.connectedOn ? `
-                        <div class="info-item">
-                            <div class="info-label">Connected On</div>
-                            <div class="info-value">${data.connectedOn}</div>
-                        </div>
-                        ` : ''}
-                    </div>
-                `;
+                let html = '';
+
+                html += `<div class="info-item">
+                    <strong style="color: #0077b5;">👤 Name</strong><br/>
+                    <span style="font-size: 16px;">${data.fullName || 'N/A'}</span>
+                </div>`;
+
+                if (data.company) {
+                    html += `<div class="info-item">
+                        <strong style="color: #0077b5;">🏢 Company</strong><br/>
+                        <span>${data.company}</span>
+                    </div>`;
+                }
+
+                if (data.position) {
+                    html += `<div class="info-item">
+                        <strong style="color: #0077b5;">💼 Position</strong><br/>
+                        <span>${data.position}</span>
+                    </div>`;
+                }
+
+                if (data.email) {
+                    html += `<div class="info-item">
+                        <strong style="color: #0077b5;">📧 Email</strong><br/>
+                        <a href="mailto:${data.email}" style="color: #0077b5; text-decoration: none;">${data.email}</a>
+                    </div>`;
+                }
+
+                if (data.connectedOn) {
+                    const date = new Date(data.connectedOn);
+                    const formattedDate = date.toLocaleDateString('en-US', {
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric'
+                    });
+                    html += `<div class="info-item">
+                        <strong style="color: #0077b5;">📅 Connected On</strong><br/>
+                        <span>${formattedDate}</span>
+                    </div>`;
+                }
+
+                if (data.url) {
+                    html += `<div class="info-item">
+                        <strong style="color: #0077b5;">🔗 LinkedIn Profile</strong><br/>
+                        <a href="${data.url}" target="_blank" style="color: #0077b5; text-decoration: none;">View Profile →</a>
+                    </div>`;
+                }
+
+                document.getElementById('nodeInfo').innerHTML = html;
             }
         }
         
@@ -2403,26 +2932,19 @@
         function applyFilters() {
             console.log('=== APPLY FILTERS CALLED ===');
             const searchQuery = document.getElementById('searchBox').value.toLowerCase().trim();
-            const companyFilter = document.getElementById('filterCompany').value.toLowerCase().trim();
-            const positionFilter = document.getElementById('filterPosition').value.toLowerCase().trim();
-            const dateFilter = document.getElementById('filterDate').value.toLowerCase().trim();
-            
-            console.log('Filters:', { searchQuery, companyFilter, positionFilter, dateFilter });
-            
+
+            console.log('Search query:', searchQuery);
+
             filteredData = allData.filter(d => {
-                const matchSearch = !searchQuery || 
+                const matchSearch = !searchQuery ||
                     d.fullName.toLowerCase().includes(searchQuery) ||
                     d.company.toLowerCase().includes(searchQuery) ||
                     d.position.toLowerCase().includes(searchQuery) ||
                     d.email.toLowerCase().includes(searchQuery);
-                
-                const matchCompany = !companyFilter || d.company.toLowerCase().includes(companyFilter);
-                const matchPosition = !positionFilter || d.position.toLowerCase().includes(positionFilter);
-                const matchDate = !dateFilter || d.connectedOn.toLowerCase().includes(dateFilter);
-                
-                return matchSearch && matchCompany && matchPosition && matchDate;
+
+                return matchSearch;
             });
-            
+
             if (allData.length > 0) {
                 console.log(`After filter: ${filteredData.length} connections`);
                 applyYearFilterAndRebuild();
@@ -2433,9 +2955,6 @@
         
         function resetView() {
             document.getElementById('searchBox').value = '';
-            document.getElementById('filterCompany').value = '';
-            document.getElementById('filterPosition').value = '';
-            document.getElementById('filterDate').value = '';
             filteredData = [...allData];
             if (allData.length > 0) {
                 applyYearFilterAndRebuild();
@@ -2471,10 +2990,6 @@
         }
         
         function updateStats() {
-            document.getElementById('stats').style.display = 'flex';
-            document.getElementById('totalConnections').textContent = allData.length;
-            document.getElementById('displayedConnections').textContent = filteredData.length;
-
             // Update header count
             const countEl = document.getElementById('connectionCount');
             countEl.style.display = 'inline-block';
@@ -2628,7 +3143,23 @@
                     return `<div style="padding: 10px;">
                         <div style="margin-bottom: 3px;">${formatCareerDate(startDate)} - ${formatCareerDate(endDate)}</div>
                         <div style="margin-bottom: 5px; color: #666;">Duration: ${duration}</div>
+                        <div style="font-size: 11px; color: #0077b5; margin-top: 5px;">Click to view network</div>
                     </div>`;
+                });
+
+                // Add click listener to open company network modal
+                series.listen('pointClick', function(e) {
+                    const clickedCompany = company;
+                    console.log('Career timeline bar clicked:', clickedCompany);
+
+                    // Check if LinkedIn data is loaded
+                    if (!allData || allData.length === 0) {
+                        showNotification('Please load LinkedIn connections data first', 'error');
+                        return;
+                    }
+
+                    // Open the company network modal
+                    openCompanyModal(clickedCompany);
                 });
             });
 
@@ -2702,10 +3233,7 @@
 
             // Set container and draw
             careerChart.container('careerTimeline');
-            careerChart.background().fill({
-                keys: ['#667eea', '#764ba2'],
-                angle: 135
-            });
+            careerChart.background().fill('#1a1a2e');
             careerChart.draw();
 
             showNotification('Career timeline loaded successfully!', 'success');

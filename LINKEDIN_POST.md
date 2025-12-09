@@ -33,12 +33,15 @@ A single-file web application that transforms your LinkedIn connections export i
 **Hierarchical force-directed graph** with you at the center, companies in the middle ring, and individual connections on the outer ring.
 
 ✨ **Key Features:**
+- **Profession Grouping**: Toggle 4-level structure (You → Companies → Professions → People)
 - **Smart filtering**: Show companies with 5+ connections (configurable 1-50+)
 - **Click-to-expand**: Toggle individual members on/off for performance
 - **Company expansion**: Click any company to expand its members when in compact mode
+- **Hover to Focus**: Hover over company for 3 seconds to fade others
 - **Year navigation**: Filter by year to see network evolution
-- **Color-coded**: Each company has a unique color
+- **Color-coded**: Each company has a unique color (professions use lighter shades)
 - **Interactive**: Drag nodes, zoom, pan, and click to explore
+- **Advanced Physics**: Strong force simulation for clear layered positioning
 
 ### 2️⃣ Timeline Chart
 ![Timeline Chart](images/timline-chart.png)
@@ -60,7 +63,8 @@ A single-file web application that transforms your LinkedIn connections export i
 ✨ **Features:**
 - Instant visual overview of network distribution
 - Zoom and pan support
-- Click bubbles to filter network
+- **Click bubbles to open detailed company network modal**
+- Modal shows 3-level graph: Company → Professions → People
 - See which companies dominate your network
 
 ### 4️⃣ Calendar Heatmap
@@ -71,6 +75,8 @@ A single-file web application that transforms your LinkedIn connections export i
 ✨ **Features:**
 - Navigate between years
 - Color intensity shows connections per day
+- **Click any day to see all connections made that day**
+- Connection cards show name, company, position with quick view
 - Identify networking patterns and active periods
 - Discover your peak networking times
 
@@ -87,6 +93,8 @@ A single-file web application that transforms your LinkedIn connections export i
   - Number of LinkedIn connections from that company
 - Company names displayed on timeline bars
 - Color-coded by company matching the network graph
+- **Click company bars to open detailed network modal**
+- View company-specific connections grouped by profession
 - Scroll and zoom to explore career progression
 - Load from separate positions CSV file
 
@@ -107,6 +115,9 @@ A single-file web application that transforms your LinkedIn connections export i
 - 📱 **Responsive design**: Works on desktop and mobile
 - 🔒 **100% local**: Your data never leaves your browser
 - 💾 **Export capability**: Save filtered data as JSON
+- 🎭 **Unified dark theme**: Consistent `#1a1a2e` background across all views
+- 🔗 **Cross-view navigation**: Seamless modal popups for deep dives
+- 👤 **Standardized details**: Clean emoji-based info panels everywhere
 
 ---
 
@@ -163,13 +174,36 @@ I'm not a frontend expert. I've never built force-directed graphs before. Yet in
 
 ---
 
+## 🆕 Recent Enhancements
+
+Since the initial build, I've added several powerful features through continued AI collaboration:
+
+**Profession Grouping** 🎯
+- Toggle to view 4-level hierarchy: You → Companies → Professions → People
+- Advanced force simulation keeps layers distinct and visually clear
+- Color-coded professions using lighter shades of company colors
+
+**Interactive Modals** 📊
+- Click bubble chart companies to see detailed network breakdown
+- Click career timeline bars to explore company connections
+- Click calendar days to view all connections made that day
+- Each modal includes person details with formatted info panels
+
+**Enhanced UX** ✨
+- Unified dark theme (`#1a1a2e`) across all visualizations
+- Standardized connection details with emoji icons (👤 🏢 💼 📧 📅 🔗)
+- 3-second hover delay to focus on specific companies
+- Smooth animations and beautiful purple gradient headers
+
+---
+
 ## 🔮 What's Next?
 
 I'm considering adding:
 - 📊 **Connection strength indicators**: Message frequency, mutual connections
 - 🌐 **Industry clustering**: Group by industry instead of company
-- 🎨 **Dark mode**: Because why not?
 - 🖼️ **Export as image**: Save beautiful visualizations to share
+- 🔍 **Filter by calendar date**: Select date range from calendar to filter connections
 
 **Open question for the community:** What would YOU want to see in a LinkedIn network visualizer?
 
