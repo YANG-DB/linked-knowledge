@@ -1,4 +1,4 @@
-# LinkedIn Connections - Synthetic Data Summary (UPDATED)
+# LinkedIn Connections - Synthetic Data Summary
 
 ## 📊 Dataset Overview
 
@@ -23,10 +23,10 @@
 2017: 162 connections  ██████████░░░░░░░░░░
 2018: 174 connections  ███████████░░░░░░░░░
 2019: 159 connections  ██████████░░░░░░░░░░
-2020: 122 connections  ████████░░░░░░░░░░░░  ← COVID-19 Impact
+2020: 122 connections  ████████░░░░░░░░░░░░  
 2021: 143 connections  █████████░░░░░░░░░░░
 2022: 156 connections  ██████████░░░░░░░░░░
-2023: 175 connections  ███████████░░░░░░░░░  ← Peak Networking
+2023: 175 connections  ███████████░░░░░░░░░  
 2024: 137 connections  █████████░░░░░░░░░░░
 2025:  92 connections  ██████░░░░░░░░░░░░░░  (Through Dec 5)
 ```
@@ -199,56 +199,6 @@
 
 ---
 
-## 🚀 Usage
-
-Load this CSV file into the LinkedIn Knowledge Graph Explorer to:
-
-1. **Visualize** your network growth over 15 years
-2. **Analyze** company clusters and career connections
-3. **Identify** key networking periods
-4. **Explore** professional relationships
-5. **Filter** by company, position, or time period
-6. **Track** career progression through the network
-
----
-
-## 📈 What's New in This Version
-
-### Changes from Previous Version (1,331 → 1,869)
-- **+538 connections** added
-- More realistic peak networking years (2017-2019, 2023)
-- Better COVID-19 impact modeling
-- Enhanced company distribution
-- More diverse job titles
-- Improved career progression timeline
-
-### Key Improvements
-- **Higher density** in peak years for more realistic visualization
-- **Better company balance** across FAANG, unicorns, and startups
-- **Enhanced timeline** showing clear career phases
-- **More connections** to test performance with larger networks
-
----
-
-## 💡 Use Cases
-
-### Perfect for Testing:
-✅ Graph visualization performance with large datasets  
-✅ Timeline analysis with 15+ years of data  
-✅ Company clustering algorithms  
-✅ Network growth analytics  
-✅ Filter and search functionality  
-✅ Export and data processing features  
-
-### Demonstrates:
-✅ Realistic career networking patterns  
-✅ Industry evolution (2010-2025)  
-✅ COVID-19 impact on professional networking  
-✅ Peak networking periods  
-✅ Company diversity in tech sector  
-
----
-
 ## 📝 Notes
 
 - All data is synthetically generated
@@ -259,9 +209,3 @@ Load this CSV file into the LinkedIn Knowledge Graph Explorer to:
 - The dataset is production-ready and optimized for visualization
 
 ---
-
-**Generated:** December 5, 2025  
-**Version:** 2.0 (Enhanced with +538 connections)  
-**Generator:** Python 3 with realistic career modeling  
-**Purpose:** Testing and demonstration of LinkedIn network visualization  
-**Dataset Size:** 1,869 connections across 90 companies over 15 years

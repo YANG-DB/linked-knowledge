@@ -207,36 +207,21 @@ Edit `styles.css` to adjust:
 
 ### Data Files
 
-**Connections.csv** (179KB)
+**Connections.csv** 
 - 1,869 connections
 - LinkedIn export format
 - UTF-8 encoded
-- Production-ready
 
-**generate_connections.py** (12KB)
+**Positions.csv**
+- 8 positions
+- LinkedIn export format
+- UTF-8 encoded
+
+**generate_connections.py** 
 - Python 3 script
 - Configurable parameters
 - Statistics generator
 - Reusable tool
-
-### Documentation
-
-**README.md** (6.7KB)
-- Full documentation
-- Usage instructions
-- Feature list
-- Troubleshooting
-
-**DATA_SUMMARY.md** (7.9KB)
-- Dataset statistics
-- Growth timeline
-- Company breakdown
-- Career analysis
-
-**COMPARISON.md** (3.4KB)
-- Before/after stats
-- Year-by-year changes
-- Improvement details
 
 ---
 
@@ -246,17 +231,8 @@ Edit `styles.css` to adjust:
 - **React 18** - UI framework
 - **Reagraph** - Graph visualization
 - **PapaParse** - CSV parsing
-- **ES Modules** - Modern JavaScript
 - **CSS Grid/Flexbox** - Layout
 
-### Concepts Demonstrated
-- Force-directed graphs
-- Network visualization
-- Data filtering/search
-- State management
-- Event handling
-- File I/O
-- Export functionality
 
 ---
 
@@ -272,13 +248,6 @@ Edit `styles.css` to adjust:
 7. **Path Finding** - Connection paths
 8. **Export as Image** - PNG/SVG export
 
-### Integration Ideas
-1. Connect to LinkedIn API (with OAuth)
-2. Add database backend
-3. Multi-user support
-4. Real-time collaboration
-5. Advanced analytics
-6. AI-powered insights
 
 ---
 
@@ -315,9 +284,3 @@ Everything is set up and ready to go. Just open `index.html`, load `Connections.
 
 **Enjoy!** 🚀
 
----
-
-**Package Version:** 2.0  
-**Last Updated:** December 5, 2025  
-**Total Files:** 8  
-**Total Size:** ~248 KB
