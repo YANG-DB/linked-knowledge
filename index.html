@@ -675,7 +675,7 @@
             </div>
 
             <div class="viz-content">
-                <div class="viz-panel active" id="graphPanel">
+                <div class="viz-panel" id="graphPanel">
                     <!-- Panel Header for CSV Loading -->
                     <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid rgba(255,255,255,0.1);">
                         <div style="display: flex; align-items: center; gap: 15px;">
@@ -1372,7 +1372,14 @@
                             }
                             applyYearFilterAndRebuild();
                         } else {
-                            // If members are shown, just toggle highlight
+                            // If members are shown, show member list and highlight
+                            handleNodeClick({
+                                type: 'company',
+                                name: d.data.name,
+                                data: d.data,
+                                children: d.children,
+                                depth: d.depth
+                            });
                             handleCompanyHighlight(d);
                         }
                     } else if (d.depth === 2 && d.data.type === 'profession') {
@@ -1384,8 +1391,15 @@
                             showNotification(`Expanding ${d.data.name} (${d.data.employeeCount} connections)`, 'success');
                             applyYearFilterAndRebuild();
                         } else {
-                            // Otherwise just show info
-                            showNotification(`${d.data.name}: ${d.data.employeeCount} connections`, 'info');
+                            // Show profession member list in sidebar
+                            handleNodeClick({
+                                type: 'profession',
+                                name: d.data.name,
+                                data: d.data,
+                                children: d.children,
+                                parent: d.parent,
+                                depth: d.depth
+                            });
                         }
                     } else if (d.depth === 2 || d.depth === 3) {
                         // Person node clicked (depth 2 when no profession grouping, depth 3 when grouped)
@@ -1657,6 +1671,8 @@
                 .duration(300)
                 .attr('opacity', function(d) {
                     const parentData = d3.select(this.parentNode).datum();
+                    // Safety check: ensure parentData exists and has a key
+                    if (!parentData || !parentData.key) return 0.9;
                     return parentData.key === companyName ? 0.9 : 0.1;
                 });
         }
@@ -1851,13 +1867,15 @@
                 .join('g')
                 .attr('fill', d => companyColors[d.key] || '#999');
 
+            const bandwidth = Math.max(x.bandwidth(), 1); // Ensure minimum width of 1px
+
             const bars = barGroups.selectAll('rect')
                 .data(d => d)
                 .join('rect')
                 .attr('x', d => x(d.data.date))
                 .attr('y', d => y(d[1]))
-                .attr('height', d => y(d[0]) - y(d[1]))
-                .attr('width', x.bandwidth())
+                .attr('height', d => Math.max(y(d[0]) - y(d[1]), 0)) // Ensure non-negative height
+                .attr('width', bandwidth)
                 .attr('opacity', 0.7)
                 .style('cursor', 'pointer')
                 .on('mouseover', function(event, d) {
@@ -3169,21 +3187,165 @@
                 .on('end', dragended);
         }
         
-        function handleNodeClick(nodeData) {
-            selectedNode = nodeData;
-            
-            // Update node colors
-            node.attr('fill', d => {
-                if (d.id === nodeData.id) return '#ffc107';
-                if (d.type === 'central') return '#0077b5';
-                const company = d.data?.company || 'Unknown';
-                return companyColors[company] || '#28a745';
+        // Show company members in main graph sidebar
+        function showMainGraphCompanyMembers(companyNode) {
+            console.log('showMainGraphCompanyMembers called with:', companyNode);
+            console.log('groupByProfession:', groupByProfession);
+            console.log('companyNode.children:', companyNode.children);
+
+            const sidebar = document.getElementById('nodeInfo');
+            const companyName = companyNode.name || companyNode.data?.name;
+            const companyColor = companyColors[companyName] || '#28a745';
+
+            // Get all members - need to traverse the hierarchy
+            let allMembers = [];
+
+            if (groupByProfession && companyNode.children) {
+                // When grouped by profession, children are profession nodes
+                companyNode.children.forEach(professionNode => {
+                    console.log('Processing profession node:', professionNode);
+                    if (professionNode.children) {
+                        professionNode.children.forEach(personNode => {
+                            console.log('Person node:', personNode);
+                            console.log('Person node.data:', personNode.data);
+                            console.log('Person node.data.data:', personNode.data.data);
+                            // The actual person data is in personNode.data.data
+                            if (personNode.data && personNode.data.data) {
+                                allMembers.push(personNode.data.data);
+                            } else if (personNode.data) {
+                                allMembers.push(personNode.data);
+                            }
+                        });
+                    }
+                });
+            } else if (companyNode.children) {
+                // Direct children are people
+                companyNode.children.forEach(personNode => {
+                    console.log('Processing person node:', personNode);
+                    console.log('Person node.data:', personNode.data);
+                    console.log('Person node.data.data:', personNode.data.data);
+                    // The actual person data is in personNode.data.data
+                    if (personNode.data && personNode.data.data) {
+                        allMembers.push(personNode.data.data);
+                    } else if (personNode.data) {
+                        allMembers.push(personNode.data);
+                    }
+                });
+            } else {
+                // Fallback: get members from filteredData
+                console.log('No children found, using filteredData fallback');
+                allMembers = filteredData.filter(person => person.company === companyName);
+            }
+
+            console.log('Total members found:', allMembers.length);
+
+            let html = `
+                <div style="margin-bottom: 20px;">
+                    <h3 style="margin: 0 0 8px 0; color: #0077b5; font-size: 16px; font-weight: 600;">🏢 ${companyName}</h3>
+                    <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 16px;">
+                        <div style="width: 12px; height: 12px; border-radius: 50%; background: ${companyColor};"></div>
+                        <span style="color: #6c757d; font-size: 13px;">${allMembers.length} connection${allMembers.length !== 1 ? 's' : ''}</span>
+                    </div>
+                </div>
+                <div style="max-height: calc(100vh - 400px); overflow-y: auto;">
+            `;
+
+            allMembers.forEach(person => {
+                html += `
+                    <div class="connection-card" onclick='handleNodeClick({type: "person", data: ${JSON.stringify(person).replace(/'/g, "\\'")}})' style="margin-bottom: 12px; cursor: pointer; transition: all 0.2s;">
+                        <div class="connection-card-header">
+                            <div>
+                                <div class="connection-card-name">${person.fullName || 'Unknown'}</div>
+                                <div class="connection-card-company" style="color: ${companyColor};">${person.position || 'No position'}</div>
+                            </div>
+                            <div class="connection-card-badge" style="background: ${companyColor};">View</div>
+                        </div>
+                        ${person.email ? `<div class="connection-card-position" style="font-size: 12px; color: #6c757d;">${person.email}</div>` : ''}
+                    </div>
+                `;
             });
-            
+
+            html += '</div>';
+            sidebar.innerHTML = html;
+        }
+
+        // Show profession members in main graph sidebar
+        function showMainGraphProfessionMembers(professionNode) {
+            console.log('showMainGraphProfessionMembers called with:', professionNode);
+
+            const sidebar = document.getElementById('nodeInfo');
+            const professionName = professionNode.name || professionNode.data?.name;
+            const companyName = professionNode.company || professionNode.data?.company || 'Unknown Company';
+            const professionColor = getProfessionColor(professionName);
+
+            // Get all members from children
+            let allMembers = [];
+            if (professionNode.children) {
+                professionNode.children.forEach(personNode => {
+                    console.log('Person node in profession:', personNode);
+                    console.log('Person node.data:', personNode.data);
+                    console.log('Person node.data.data:', personNode.data.data);
+                    // The actual person data is in personNode.data.data
+                    if (personNode.data && personNode.data.data) {
+                        allMembers.push(personNode.data.data);
+                    } else if (personNode.data) {
+                        allMembers.push(personNode.data);
+                    }
+                });
+            } else {
+                // Fallback: get members from filteredData by position
+                console.log('No children found for profession, using filteredData fallback');
+                allMembers = filteredData.filter(person =>
+                    person.position === professionName && person.company === companyName
+                );
+            }
+
+            console.log('Total profession members found:', allMembers.length);
+
+            let html = `
+                <div style="margin-bottom: 20px;">
+                    <h3 style="margin: 0 0 8px 0; color: #0077b5; font-size: 16px; font-weight: 600;">💼 ${professionName}</h3>
+                    <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
+                        <div style="width: 12px; height: 12px; border-radius: 50%; background: ${professionColor};"></div>
+                        <span style="color: #6c757d; font-size: 13px;">${allMembers.length} member${allMembers.length !== 1 ? 's' : ''}</span>
+                    </div>
+                    <div style="color: #6c757d; font-size: 12px; margin-bottom: 16px;">at ${companyName}</div>
+                </div>
+                <div style="max-height: calc(100vh - 400px); overflow-y: auto;">
+            `;
+
+            allMembers.forEach(person => {
+                html += `
+                    <div class="connection-card" onclick='handleNodeClick({type: "person", data: ${JSON.stringify(person).replace(/'/g, "\\'")}})' style="margin-bottom: 12px; cursor: pointer; transition: all 0.2s;">
+                        <div class="connection-card-header">
+                            <div>
+                                <div class="connection-card-name">${person.fullName || 'Unknown'}</div>
+                                <div class="connection-card-company" style="color: ${professionColor};">${person.position || professionName}</div>
+                            </div>
+                            <div class="connection-card-badge" style="background: ${professionColor};">View</div>
+                        </div>
+                        ${person.email ? `<div class="connection-card-position" style="font-size: 12px; color: #6c757d;">${person.email}</div>` : ''}
+                    </div>
+                `;
+            });
+
+            html += '</div>';
+            sidebar.innerHTML = html;
+        }
+
+        function handleNodeClick(nodeData) {
+            console.log('=== handleNodeClick called ===');
+            console.log('nodeData:', nodeData);
+            console.log('nodeData.type:', nodeData.type);
+            console.log('nodeData.depth:', nodeData.depth);
+
+            selectedNode = nodeData;
+
             // Show sidebar
             document.getElementById('sidebar').classList.add('active');
-            
+
             if (nodeData.type === 'central') {
+                console.log('Handling central node');
                 document.getElementById('nodeInfo').innerHTML = `
                     <div class="info-item">
                         <strong style="color: #0077b5;">👤 Name</strong><br/>
@@ -3194,7 +3356,16 @@
                         <span style="font-size: 16px;">${allData.length}</span>
                     </div>
                 `;
+            } else if (nodeData.type === 'company') {
+                console.log('Handling company node - calling showMainGraphCompanyMembers');
+                // Show company members list
+                showMainGraphCompanyMembers(nodeData);
+            } else if (nodeData.type === 'profession') {
+                console.log('Handling profession node - calling showMainGraphProfessionMembers');
+                // Show profession members list
+                showMainGraphProfessionMembers(nodeData);
             } else {
+                // Person node - show individual details
                 const data = nodeData.data;
                 let html = '';
 
