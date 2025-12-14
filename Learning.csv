@@ -1,0 +1,21 @@
+Content Title,Content Description,Content Type,Content Last Watched Date (if viewed),Content Completed At (if completed),Content Saved,Notes taken on videos (if taken)
+Advanced Kubernetes Patterns,Deep dive into Kubernetes operators and custom resource definitions. Covers advanced networking patterns and service mesh integration.,Course,2023-11-20 14:30 UTC,2023-11-22 18:45 UTC,true,Implemented CRD for graph database deployment
+Graph Database Fundamentals,Comprehensive introduction to graph databases including Neo4j and property graphs. Query optimization and schema design.,Course,2022-05-15 10:00 UTC,2022-05-18 16:30 UTC,true,Applied to OpenSearch knowledge graph project
+Real-time Stream Processing with Kafka,Production-grade Kafka implementation patterns. Covers exactly-once semantics and distributed transactions.,Course,2021-08-10 09:15 UTC,2021-08-12 20:00 UTC,true,Used for Meta analytics platform
+TensorFlow 2.0 Complete Course,End-to-end machine learning with TensorFlow 2.0. Model deployment and production ML systems.,Course,2018-09-05 11:30 UTC,2018-09-10 17:45 UTC,true,Foundation for Google ML pipelines
+GraphQL Best Practices,Advanced GraphQL patterns including federation and schema stitching. Performance optimization techniques.,Course,2020-06-22 15:00 UTC,2020-06-25 19:30 UTC,true,Applied to Meta GraphQL federation
+Microservices Architecture,Designing microservices for scale. Service mesh patterns and distributed tracing.,Course,2016-03-14 10:45 UTC,2016-03-18 14:20 UTC,true,Used at Microsoft for Azure DevOps
+iOS Performance Optimization,Advanced iOS performance tuning and memory management. Framework development best practices.,Course,2012-11-08 13:00 UTC,2012-11-12 16:00 UTC,true,Applied to App Store SDK work
+Distributed Systems Theory,Consensus algorithms and distributed computing fundamentals. CAP theorem and system design.,Course,2015-05-20 09:00 UTC,2015-05-25 18:00 UTC,true,Core knowledge for all projects
+Docker and Container Orchestration,Container fundamentals and orchestration patterns. Kubernetes basics and deployment strategies.,Course,2017-02-10 11:00 UTC,2017-02-14 15:30 UTC,false,
+Machine Learning for Recommendations,Building recommendation systems at scale. Collaborative filtering and deep learning approaches.,Course,2010-08-15 10:30 UTC,2010-08-20 17:00 UTC,true,Netflix recommendation engine project
+React Advanced Patterns,Advanced React patterns including hooks and context. Performance optimization.,Course,2008-04-12 14:00 UTC,2008-04-16 19:00 UTC,true,Adobe Creative Cloud features
+Python for Data Engineering,Data pipelines with Python. Pandas and data processing at scale.,Course,2019-01-10 10:00 UTC,2019-01-15 16:30 UTC,true,Google Cloud data processing
+AWS Solutions Architect,Cloud architecture patterns on AWS. Serverless and event-driven design.,Course,2020-09-05 09:30 UTC,2020-09-10 18:00 UTC,false,
+System Design Interview Prep,Scalable system design patterns. Real-world architecture case studies.,Course,2013-12-01 11:00 UTC,2013-12-05 20:00 UTC,true,Preparation for senior roles
+Rust Programming Language,Memory safety and concurrency in Rust. Systems programming fundamentals.,Course,2023-03-15 10:00 UTC,N/A,true,Exploring for high-performance systems
+Leadership and Management,Technical leadership skills. Team building and mentoring strategies.,Course,2021-11-10 14:00 UTC,2021-11-18 17:30 UTC,true,Applied as tech lead at Meta
+Database Performance Tuning,Query optimization and indexing strategies. Distributed database patterns.,Course,2014-07-20 09:00 UTC,2014-07-25 16:00 UTC,true,Microsoft database optimization work
+Observability and Monitoring,Building observable systems. Metrics and distributed tracing.,Course,2022-02-15 11:30 UTC,2022-02-20 18:00 UTC,true,Amazon observability platform
+API Design Best Practices,RESTful and GraphQL API design. Versioning and backwards compatibility.,Course,2011-05-10 10:00 UTC,2011-05-14 15:30 UTC,true,Apple App Store APIs
+Neural Networks Deep Dive,Deep learning fundamentals. CNN and RNN architectures.,Course,2018-06-01 09:30 UTC,N/A,false,

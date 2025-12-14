@@ -115,38 +115,189 @@
             flex-direction: column;
         }
 
-        .viz-tabs {
+        /* Main Home Screen */
+        .home-screen {
             display: flex;
-            background: rgba(255, 255, 255, 0.95);
-            border-bottom: 2px solid #ddd;
-            padding: 0 20px;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 60px 40px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            overflow-y: auto;
         }
 
-        .viz-tab {
-            padding: 12px 24px;
+        .home-screen.hidden {
+            display: none;
+        }
+
+        .home-title {
+            color: white;
+            font-size: 42px;
+            font-weight: 300;
+            margin-bottom: 16px;
+            text-align: center;
+        }
+
+        .home-subtitle {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 18px;
+            font-weight: 300;
+            margin-bottom: 60px;
+            text-align: center;
+        }
+
+        .viz-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 30px;
+            max-width: 1400px;
+            width: 100%;
+        }
+
+        .viz-card {
+            background: white;
+            border-radius: 16px;
+            padding: 32px;
             cursor: pointer;
-            border: none;
-            background: none;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1),
+                        0 1px 3px rgba(0, 0, 0, 0.08);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .viz-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            transform: scaleX(0);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .viz-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15),
+                        0 6px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .viz-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .viz-card-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+            display: block;
+        }
+
+        .viz-card-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 12px;
+        }
+
+        .viz-card-description {
             font-size: 14px;
-            font-weight: 500;
             color: #6c757d;
-            border-bottom: 3px solid transparent;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .viz-card-stats {
+            display: flex;
+            gap: 16px;
+            margin-top: auto;
+        }
+
+        .viz-card-stat {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+            color: #667eea;
+            font-weight: 500;
+        }
+
+        .back-button {
+            position: fixed;
+            top: 80px;
+            left: 20px;
+            background: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 24px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #667eea;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
             transition: all 0.3s;
+            z-index: 1000;
+            display: none;
         }
 
-        .viz-tab:hover {
-            color: #0077b5;
+        .back-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
         }
 
-        .viz-tab.active {
-            color: #0077b5;
-            border-bottom-color: #0077b5;
+        .back-button.visible {
+            display: block;
+        }
+
+        .viz-tabs {
+            display: none;
         }
 
         .viz-content {
             display: flex;
             flex: 1;
             overflow: hidden;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .home-title {
+                font-size: 32px;
+            }
+
+            .home-subtitle {
+                font-size: 16px;
+                margin-bottom: 40px;
+            }
+
+            .home-screen {
+                padding: 40px 20px;
+            }
+
+            .viz-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .viz-card {
+                padding: 24px;
+            }
+
+            .viz-card-icon {
+                font-size: 40px;
+            }
+
+            .viz-card-title {
+                font-size: 20px;
+            }
+
+            .back-button {
+                top: 70px;
+                left: 10px;
+                padding: 10px 20px;
+                font-size: 13px;
+            }
         }
 
         .viz-panel {
@@ -462,14 +613,67 @@
             </div>
         </div>
 
+        <button class="back-button" id="backButton" onclick="goHome()">← Back to Home</button>
+
         <div class="main-content">
-            <div class="viz-tabs">
-                <button class="viz-tab active" onclick="switchViz('graph')">🔗 Network Graph</button>
-                <button class="viz-tab" onclick="switchViz('timeline')">📊 Timeline</button>
-                <button class="viz-tab" onclick="switchViz('bubble')">⚪ Bubble Chart</button>
-                <button class="viz-tab" onclick="switchViz('calendar')">📅 Calendar</button>
-                <button class="viz-tab" onclick="switchViz('career')">💼 Career Timeline</button>
+            <!-- Home Screen -->
+            <div class="home-screen" id="homeScreen">
+                <h1 class="home-title">LinkedIn Knowledge Graph Explorer</h1>
+                <p class="home-subtitle">Visualize and explore your professional network</p>
+
+                <div class="viz-grid">
+                    <div class="viz-card" onclick="switchViz('graph')">
+                        <span class="viz-card-icon">🔗</span>
+                        <h3 class="viz-card-title">Network Graph</h3>
+                        <p class="viz-card-description">Interactive force-directed graph showing your connections grouped by companies and professions. Explore relationships and discover patterns.</p>
+                        <div class="viz-card-stats">
+                            <span class="viz-card-stat">📊 Dynamic Layout</span>
+                            <span class="viz-card-stat">🎯 Group by Profession</span>
+                        </div>
+                    </div>
+
+                    <div class="viz-card" onclick="switchViz('timeline')">
+                        <span class="viz-card-icon">📈</span>
+                        <h3 class="viz-card-title">Timeline Chart</h3>
+                        <p class="viz-card-description">Track when you made connections over time. Visualize your networking activity and growth trends across years.</p>
+                        <div class="viz-card-stats">
+                            <span class="viz-card-stat">📅 Year by Year</span>
+                            <span class="viz-card-stat">📊 Bar Chart</span>
+                        </div>
+                    </div>
+
+                    <div class="viz-card" onclick="switchViz('bubble')">
+                        <span class="viz-card-icon">⚪</span>
+                        <h3 class="viz-card-title">Bubble Chart</h3>
+                        <p class="viz-card-description">Company-based visualization where bubble size represents the number of connections at each organization.</p>
+                        <div class="viz-card-stats">
+                            <span class="viz-card-stat">🏢 By Company</span>
+                            <span class="viz-card-stat">📏 Size = Connections</span>
+                        </div>
+                    </div>
+
+                    <div class="viz-card" onclick="switchViz('calendar')">
+                        <span class="viz-card-icon">📅</span>
+                        <h3 class="viz-card-title">Calendar Heatmap</h3>
+                        <p class="viz-card-description">GitHub-style calendar showing your connection activity. Identify your most active networking periods.</p>
+                        <div class="viz-card-stats">
+                            <span class="viz-card-stat">🗓️ Daily View</span>
+                            <span class="viz-card-stat">🔥 Activity Heatmap</span>
+                        </div>
+                    </div>
+
+                    <div class="viz-card" onclick="switchViz('career')">
+                        <span class="viz-card-icon">💼</span>
+                        <h3 class="viz-card-title">Career Timeline</h3>
+                        <p class="viz-card-description">Visualize your professional journey with positions timeline. See connection growth during each role.</p>
+                        <div class="viz-card-stats">
+                            <span class="viz-card-stat">🎯 Positions</span>
+                            <span class="viz-card-stat">📊 Connections per Role</span>
+                        </div>
+                    </div>
+                </div>
             </div>
+
             <div class="viz-content">
                 <div class="viz-panel active" id="graphPanel">
                     <!-- Panel Header for CSV Loading -->
@@ -647,7 +851,7 @@
                     <div id="modalSidebar" style="width: 320px; background: rgba(255, 255, 255, 0.95); border-radius: 8px; padding: 20px; overflow-y: auto; box-shadow: -2px 0 10px rgba(0,0,0,0.3);">
                         <h3 style="margin: 0 0 15px 0; color: #0077b5; font-size: 18px; font-weight: 600;">Connection Details</h3>
                         <div id="modalNodeInfo">
-                            <p style="color: #6c757d; font-size: 14px; text-align: center; padding: 40px 20px;">Click on any person node to view their details</p>
+                            <p style="color: #6c757d; font-size: 14px; text-align: center; padding: 40px 20px;">Click on a profession to see members or a person to view details</p>
                         </div>
                     </div>
                 </div>
@@ -684,9 +888,9 @@
         function switchViz(vizType) {
             currentViz = vizType;
 
-            // Update tabs
-            document.querySelectorAll('.viz-tab').forEach(tab => tab.classList.remove('active'));
-            event.target.classList.add('active');
+            // Hide home screen and show back button
+            document.getElementById('homeScreen').classList.add('hidden');
+            document.getElementById('backButton').classList.add('visible');
 
             // Update panels
             document.querySelectorAll('.viz-panel').forEach(panel => panel.classList.remove('active'));
@@ -707,6 +911,20 @@
                 document.getElementById('careerPanel').classList.add('active');
                 // Career timeline is loaded separately with its own CSV
             }
+        }
+
+        function goHome() {
+            // Show home screen and hide back button
+            document.getElementById('homeScreen').classList.remove('hidden');
+            document.getElementById('backButton').classList.remove('visible');
+
+            // Hide all panels
+            document.querySelectorAll('.viz-panel').forEach(panel => panel.classList.remove('active'));
+
+            // Close sidebar if open
+            document.getElementById('sidebar').classList.remove('active');
+
+            currentViz = 'home';
         }
         
         function toggleClustering(enabled) {
@@ -2206,8 +2424,11 @@
             document.getElementById('companyModal').classList.remove('show');
             // Clear the graph
             d3.select('#companyNetworkGraph').selectAll('*').remove();
+            // Reset profession color map for next modal
+            professionColorMap.clear();
+            professionColorIndex = 0;
             // Reset sidebar to default message
-            document.getElementById('modalNodeInfo').innerHTML = '<p style="color: #6c757d; font-size: 14px; text-align: center; padding: 40px 20px;">Click on any person node to view their details</p>';
+            document.getElementById('modalNodeInfo').innerHTML = '<p style="color: #6c757d; font-size: 14px; text-align: center; padding: 40px 20px;">Click on a profession to see members or a person to view details</p>';
         }
 
         // Close modal when clicking outside
@@ -2324,10 +2545,16 @@
                     return 8;  // Person
                 })
                 .attr('fill', d => {
-                    const color = companyColors[companyName] || '#28a745';
-                    if (d.depth === 0) return color;
-                    if (d.depth === 1) return d3.color(color).brighter(0.3);
-                    return d3.color(color).brighter(0.6);
+                    if (d.depth === 0) {
+                        // Company node - use company color
+                        return companyColors[companyName] || '#28a745';
+                    } else if (d.depth === 1) {
+                        // Profession node - assign unique color per profession
+                        return getProfessionColor(d.data.name);
+                    } else {
+                        // Person node - use parent profession's color
+                        return getProfessionColor(d.parent.data.name);
+                    }
                 })
                 .attr('stroke', '#fff')
                 .attr('stroke-width', 2)
@@ -2359,9 +2586,13 @@
                             showNotification('Unable to load person details', 'error');
                         }
                     } else if (d.depth === 1) {
+                        // Show profession members list in sidebar
                         console.log('Profession node clicked:', d.data.name, `(${d.data.employeeCount} people)`);
+                        showProfessionMembers(d.data.name, d.data.children, companyName);
                     } else if (d.depth === 0) {
                         console.log('Company node clicked:', d.data.name);
+                        // Clear sidebar
+                        document.getElementById('modalNodeInfo').innerHTML = '<p style="color: #6c757d; font-size: 14px; text-align: center; padding: 40px 20px;">Click on a profession to see members or a person to view details</p>';
                     }
                 });
 
@@ -2384,7 +2615,9 @@
                 .attr('dx', d => d.depth === 0 ? 0 : 12)
                 .attr('dy', d => d.depth === 0 ? -35 : 4)
                 .attr('text-anchor', d => d.depth === 0 ? 'middle' : 'start')
-                .attr('fill', '#333')
+                .attr('fill', 'white')
+                .attr('stroke', '#1a1a2e')
+                .attr('stroke-width', 0.5)
                 .style('pointer-events', 'none');
 
             // Update positions on tick
@@ -2420,6 +2653,61 @@
                 d.fx = null;
                 d.fy = null;
             }
+        }
+
+        // Profession color mapping
+        const professionColorPalette = [
+            '#667eea', '#764ba2', '#f093fb', '#4facfe', '#00f2fe',
+            '#43e97b', '#38f9d7', '#fa709a', '#fee140', '#30cfd0',
+            '#a8edea', '#fed6e3', '#c471f5', '#f64f59', '#12c2e9',
+            '#f857a6', '#ff6a88', '#5f72bd', '#9921e8', '#00d2ff'
+        ];
+        let professionColorMap = new Map();
+        let professionColorIndex = 0;
+
+        function getProfessionColor(professionName) {
+            if (!professionColorMap.has(professionName)) {
+                const color = professionColorPalette[professionColorIndex % professionColorPalette.length];
+                professionColorMap.set(professionName, color);
+                professionColorIndex++;
+            }
+            return professionColorMap.get(professionName);
+        }
+
+        // Show profession members in sidebar
+        function showProfessionMembers(professionName, members, companyName) {
+            const professionColor = getProfessionColor(professionName);
+            const sidebar = document.getElementById('modalNodeInfo');
+
+            let html = `
+                <div style="margin-bottom: 20px;">
+                    <h3 style="margin: 0 0 8px 0; color: #0077b5; font-size: 16px; font-weight: 600;">${professionName}</h3>
+                    <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 16px;">
+                        <div style="width: 12px; height: 12px; border-radius: 50%; background: ${professionColor};"></div>
+                        <span style="color: #6c757d; font-size: 13px;">${members.length} member${members.length !== 1 ? 's' : ''} at ${companyName}</span>
+                    </div>
+                </div>
+                <div style="max-height: calc(100vh - 300px); overflow-y: auto;">
+            `;
+
+            members.forEach(member => {
+                const person = member.data;
+                html += `
+                    <div class="connection-card" onclick="showModalPersonDetails(${JSON.stringify(person).replace(/"/g, '&quot;')}, '${professionName}')" style="margin-bottom: 12px; cursor: pointer; transition: all 0.2s;">
+                        <div class="connection-card-header">
+                            <div>
+                                <div class="connection-card-name">${person.fullName || 'Unknown'}</div>
+                                <div class="connection-card-company" style="color: ${professionColor};">${person.position || professionName}</div>
+                            </div>
+                            <div class="connection-card-badge" style="background: ${professionColor};">View</div>
+                        </div>
+                        ${person.email ? `<div class="connection-card-position" style="font-size: 12px; color: #6c757d;">${person.email}</div>` : ''}
+                    </div>
+                `;
+            });
+
+            html += '</div>';
+            sidebar.innerHTML = html;
         }
 
         // Calendar Day Modal Functions
@@ -2473,18 +2761,20 @@
             // Close the calendar day modal
             closeCalendarDayModal();
 
-            // Show person details in main sidebar
-            handleNodeClick({
-                id: person.id,
-                name: person.fullName,
-                type: 'person',
-                data: person
-            });
-
             // Switch to graph view to show the sidebar
             if (currentViz !== 'graph') {
-                document.querySelector('.viz-tab[onclick*="graph"]').click();
+                switchViz('graph');
             }
+
+            // Show person details in sidebar
+            setTimeout(() => {
+                handleNodeClick({
+                    id: person.id,
+                    name: person.fullName,
+                    type: 'person',
+                    data: person
+                });
+            }, 100);
         }
 
         // Close calendar day modal when clicking outside
