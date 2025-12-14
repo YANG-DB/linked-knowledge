@@ -1,0 +1,1497 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LinkedIn Knowledge Graph - Functional Tests</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        h1 {
+            color: #0077b5;
+            border-bottom: 3px solid #0077b5;
+            padding-bottom: 10px;
+        }
+        h2 {
+            color: #333;
+            margin-top: 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 10px 15px;
+            border-radius: 5px;
+        }
+        .test-suite {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .test-case {
+            margin: 15px 0;
+            padding: 15px;
+            border-left: 4px solid #ddd;
+            background: #fafafa;
+        }
+        .test-case.passed {
+            border-left-color: #28a745;
+            background: #f0f9f4;
+        }
+        .test-case.failed {
+            border-left-color: #dc3545;
+            background: #fff5f5;
+        }
+        .test-name {
+            font-weight: 600;
+            font-size: 16px;
+            margin-bottom: 8px;
+        }
+        .test-section {
+            margin: 8px 0;
+            font-size: 14px;
+        }
+        .test-section strong {
+            color: #0077b5;
+        }
+        .test-result {
+            margin-top: 10px;
+            padding: 8px;
+            border-radius: 4px;
+            font-weight: 600;
+        }
+        .test-result.pass {
+            background: #28a745;
+            color: white;
+        }
+        .test-result.fail {
+            background: #dc3545;
+            color: white;
+        }
+        .summary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+        }
+        .summary-stat {
+            text-align: center;
+        }
+        .summary-stat-value {
+            font-size: 48px;
+            font-weight: bold;
+        }
+        .summary-stat-label {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        .code {
+            background: #f4f4f4;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+        }
+        button {
+            background: #0077b5;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            margin: 10px 5px;
+        }
+        button:hover {
+            background: #005885;
+        }
+        .error-details {
+            background: #fff;
+            border: 1px solid #dc3545;
+            padding: 10px;
+            margin-top: 8px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            color: #dc3545;
+        }
+    </style>
+</head>
+<body>
+    <h1>🧪 LinkedIn Knowledge Graph - Functional Test Suite</h1>
+
+    <div id="controls">
+        <button onclick="runAllTests()">▶️ Run All Tests</button>
+        <button onclick="clearResults()">🗑️ Clear Results</button>
+    </div>
+
+    <div id="summary" style="display: none;" class="summary">
+        <div class="summary-stat">
+            <div class="summary-stat-value" id="totalTests">0</div>
+            <div class="summary-stat-label">Total Tests</div>
+        </div>
+        <div class="summary-stat">
+            <div class="summary-stat-value" id="passedTests" style="color: #90ee90;">0</div>
+            <div class="summary-stat-label">Passed</div>
+        </div>
+        <div class="summary-stat">
+            <div class="summary-stat-value" id="failedTests" style="color: #ffcccb;">0</div>
+            <div class="summary-stat-label">Failed</div>
+        </div>
+        <div class="summary-stat">
+            <div class="summary-stat-value" id="passRate">0%</div>
+            <div class="summary-stat-label">Pass Rate</div>
+        </div>
+    </div>
+
+    <div id="testResults"></div>
+
+    <script>
+        // Test framework
+        const testResults = {
+            total: 0,
+            passed: 0,
+            failed: 0,
+            suites: []
+        };
+
+        // Mock sample data for testing
+        const mockConnectionsData = [
+            {
+                id: 1,
+                fullName: "John Smith",
+                firstName: "John",
+                lastName: "Smith",
+                email: "john.smith@example.com",
+                company: "Google",
+                position: "Software Engineer",
+                connectedOn: "2020-05-15",
+                url: "https://linkedin.com/in/johnsmith"
+            },
+            {
+                id: 2,
+                fullName: "Jane Doe",
+                firstName: "Jane",
+                lastName: "Doe",
+                email: "jane.doe@example.com",
+                company: "Google",
+                position: "Software Engineer",
+                connectedOn: "2020-06-20",
+                url: "https://linkedin.com/in/janedoe"
+            },
+            {
+                id: 3,
+                fullName: "Bob Johnson",
+                firstName: "Bob",
+                lastName: "Johnson",
+                email: "bob.j@example.com",
+                company: "Microsoft",
+                position: "Product Manager",
+                connectedOn: "2021-03-10",
+                url: "https://linkedin.com/in/bobjohnson"
+            },
+            {
+                id: 4,
+                fullName: "Alice Brown",
+                firstName: "Alice",
+                lastName: "Brown",
+                email: "alice.b@example.com",
+                company: "Microsoft",
+                position: "Software Engineer",
+                connectedOn: "2021-04-15",
+                url: "https://linkedin.com/in/alicebrown"
+            },
+            {
+                id: 5,
+                fullName: "Charlie Wilson",
+                firstName: "Charlie",
+                lastName: "Wilson",
+                email: "charlie.w@example.com",
+                company: "Amazon",
+                position: "Data Scientist",
+                connectedOn: "2022-01-20",
+                url: "https://linkedin.com/in/charliewilson"
+            }
+        ];
+
+        const mockPositionsData = [
+            {
+                companyName: "Google",
+                title: "Senior Software Engineer",
+                startDate: "2018-01-01",
+                endDate: "2020-12-31",
+                location: "Mountain View, CA"
+            },
+            {
+                companyName: "Microsoft",
+                title: "Software Engineer",
+                startDate: "2021-01-01",
+                endDate: "2023-06-30",
+                location: "Redmond, WA"
+            },
+            {
+                companyName: "Amazon",
+                title: "Senior Software Engineer",
+                startDate: "2023-07-01",
+                endDate: "",
+                location: "Seattle, WA"
+            }
+        ];
+
+        // Utility functions from main app (extracted for testing)
+        function escapeHtml(text) {
+            const map = {
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#039;'
+            };
+            return text.replace(/[&<>"']/g, m => map[m]);
+        }
+
+        function parseCareerDate(dateStr) {
+            if (!dateStr || dateStr.trim() === '') return null;
+            const parts = dateStr.split('-');
+            if (parts.length === 3) {
+                return new Date(parts[0], parts[1] - 1, parts[2]);
+            } else if (parts.length === 2) {
+                return new Date(parts[0], parts[1] - 1, 1);
+            } else if (parts.length === 1) {
+                return new Date(parts[0], 0, 1);
+            }
+            return null;
+        }
+
+        function formatCareerDate(date) {
+            return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short' });
+        }
+
+        // Test suite creation
+        function createTestSuite(suiteName) {
+            return {
+                name: suiteName,
+                tests: [],
+                addTest: function(testCase) {
+                    this.tests.push(testCase);
+                }
+            };
+        }
+
+        function runTest(testName, setup, functionality, validation) {
+            const testCase = {
+                name: testName,
+                setup: setup,
+                functionality: functionality,
+                validation: validation,
+                passed: false,
+                error: null
+            };
+
+            try {
+                // Execute setup
+                const setupData = setup();
+
+                // Execute functionality
+                const result = functionality(setupData);
+
+                // Validate results
+                const validationResult = validation(result, setupData);
+
+                testCase.passed = validationResult.passed;
+                testCase.error = validationResult.error;
+
+                testResults.total++;
+                if (testCase.passed) {
+                    testResults.passed++;
+                } else {
+                    testResults.failed++;
+                }
+            } catch (error) {
+                testCase.passed = false;
+                testCase.error = error.message;
+                testResults.total++;
+                testResults.failed++;
+            }
+
+            return testCase;
+        }
+
+        // ===================================================================
+        // TEST SUITE 1: DATA PROCESSING FUNCTIONS
+        // ===================================================================
+        function testDataProcessing() {
+            const suite = createTestSuite("Data Processing Functions");
+
+            // Test 1.1: escapeHtml - Basic HTML escaping
+            suite.addTest(runTest(
+                "escapeHtml - Should escape HTML special characters",
+                // Setup
+                () => ({
+                    input: '<scr' + 'ipt>alert("XSS")</scr' + 'ipt>',
+                    expected: '&lt;script&gt;alert(&quot;XSS&quot;)&lt;/script&gt;'
+                }),
+                // Functionality
+                (data) => escapeHtml(data.input),
+                // Validation
+                (result, data) => ({
+                    passed: result === data.expected,
+                    error: result !== data.expected ? `Expected: ${data.expected}, Got: ${result}` : null
+                })
+            ));
+
+            // Test 1.2: escapeHtml - Mixed content
+            suite.addTest(runTest(
+                "escapeHtml - Should handle mixed content with quotes and ampersands",
+                // Setup
+                () => ({
+                    input: "John's Company & Associates",
+                    expected: "John&#039;s Company &amp; Associates"
+                }),
+                // Functionality
+                (data) => escapeHtml(data.input),
+                // Validation
+                (result, data) => ({
+                    passed: result === data.expected,
+                    error: result !== data.expected ? `Expected: ${data.expected}, Got: ${result}` : null
+                })
+            ));
+
+            // Test 1.3: parseCareerDate - Full date parsing
+            suite.addTest(runTest(
+                "parseCareerDate - Should parse full date format (YYYY-MM-DD)",
+                // Setup
+                () => ({
+                    input: "2020-05-15",
+                    expectedYear: 2020,
+                    expectedMonth: 4, // 0-indexed
+                    expectedDay: 15
+                }),
+                // Functionality
+                (data) => parseCareerDate(data.input),
+                // Validation
+                (result, data) => {
+                    const passed = result !== null &&
+                                  result.getFullYear() === data.expectedYear &&
+                                  result.getMonth() === data.expectedMonth &&
+                                  result.getDate() === data.expectedDay;
+                    return {
+                        passed,
+                        error: !passed ? `Expected date: ${data.expectedYear}-${data.expectedMonth+1}-${data.expectedDay}, Got: ${result}` : null
+                    };
+                }
+            ));
+
+            // Test 1.4: parseCareerDate - Year-month format
+            suite.addTest(runTest(
+                "parseCareerDate - Should parse year-month format (YYYY-MM)",
+                // Setup
+                () => ({
+                    input: "2021-06",
+                    expectedYear: 2021,
+                    expectedMonth: 5
+                }),
+                // Functionality
+                (data) => parseCareerDate(data.input),
+                // Validation
+                (result, data) => {
+                    const passed = result !== null &&
+                                  result.getFullYear() === data.expectedYear &&
+                                  result.getMonth() === data.expectedMonth;
+                    return {
+                        passed,
+                        error: !passed ? `Expected: ${data.expectedYear}-${data.expectedMonth+1}, Got: ${result}` : null
+                    };
+                }
+            ));
+
+            // Test 1.5: parseCareerDate - Empty string
+            suite.addTest(runTest(
+                "parseCareerDate - Should return null for empty string",
+                // Setup
+                () => ({ input: "" }),
+                // Functionality
+                (data) => parseCareerDate(data.input),
+                // Validation
+                (result, data) => ({
+                    passed: result === null,
+                    error: result !== null ? `Expected null, Got: ${result}` : null
+                })
+            ));
+
+            // Test 1.6: formatCareerDate - Date formatting
+            suite.addTest(runTest(
+                "formatCareerDate - Should format date as 'Mon YYYY'",
+                // Setup
+                () => ({
+                    input: new Date(2020, 4, 15), // May 15, 2020
+                    expectedPattern: /^[A-Z][a-z]{2} \d{4}$/
+                }),
+                // Functionality
+                (data) => formatCareerDate(data.input),
+                // Validation
+                (result, data) => ({
+                    passed: data.expectedPattern.test(result),
+                    error: !data.expectedPattern.test(result) ? `Expected format 'Mon YYYY', Got: ${result}` : null
+                })
+            ));
+
+            return suite;
+        }
+
+        // ===================================================================
+        // TEST SUITE 2: DATA FILTERING FUNCTIONS
+        // ===================================================================
+        function testDataFiltering() {
+            const suite = createTestSuite("Data Filtering Functions");
+
+            // Test 2.1: Filter by company
+            suite.addTest(runTest(
+                "Filter Connections - Should filter connections by company",
+                // Setup
+                () => ({
+                    connections: mockConnectionsData,
+                    company: "Google",
+                    expectedCount: 2
+                }),
+                // Functionality
+                (data) => data.connections.filter(c => c.company === data.company),
+                // Validation
+                (result, data) => ({
+                    passed: result.length === data.expectedCount,
+                    error: result.length !== data.expectedCount ?
+                           `Expected ${data.expectedCount} connections, Got: ${result.length}` : null
+                })
+            ));
+
+            // Test 2.2: Filter by year
+            suite.addTest(runTest(
+                "Filter by Year - Should filter connections by year",
+                // Setup
+                () => ({
+                    connections: mockConnectionsData,
+                    year: 2020,
+                    expectedCount: 2
+                }),
+                // Functionality
+                (data) => data.connections.filter(c => {
+                    const connectedYear = new Date(c.connectedOn).getFullYear();
+                    return connectedYear === data.year;
+                }),
+                // Validation
+                (result, data) => ({
+                    passed: result.length === data.expectedCount,
+                    error: result.length !== data.expectedCount ?
+                           `Expected ${data.expectedCount} connections in ${data.year}, Got: ${result.length}` : null
+                })
+            ));
+
+            // Test 2.3: Filter by position
+            suite.addTest(runTest(
+                "Filter by Position - Should filter connections by position title",
+                // Setup
+                () => ({
+                    connections: mockConnectionsData,
+                    position: "Software Engineer",
+                    expectedCount: 3
+                }),
+                // Functionality
+                (data) => data.connections.filter(c => c.position === data.position),
+                // Validation
+                (result, data) => ({
+                    passed: result.length === data.expectedCount,
+                    error: result.length !== data.expectedCount ?
+                           `Expected ${data.expectedCount} with position '${data.position}', Got: ${result.length}` : null
+                })
+            ));
+
+            // Test 2.4: Filter by minimum company size
+            suite.addTest(runTest(
+                "Filter by Min Company Size - Should filter companies with minimum connection count",
+                // Setup
+                () => ({
+                    connections: mockConnectionsData,
+                    minSize: 2,
+                    expectedCompanies: ['Google', 'Microsoft']
+                }),
+                // Functionality
+                (data) => {
+                    const companyCounts = {};
+                    data.connections.forEach(c => {
+                        companyCounts[c.company] = (companyCounts[c.company] || 0) + 1;
+                    });
+                    return Object.keys(companyCounts).filter(company => companyCounts[company] >= data.minSize);
+                },
+                // Validation
+                (result, data) => {
+                    const passed = result.length === data.expectedCompanies.length &&
+                                  result.every(c => data.expectedCompanies.includes(c));
+                    return {
+                        passed,
+                        error: !passed ?
+                               `Expected companies: ${data.expectedCompanies.join(', ')}, Got: ${result.join(', ')}` : null
+                    };
+                }
+            ));
+
+            // Test 2.5: Group by profession
+            suite.addTest(runTest(
+                "Group by Profession - Should group connections by their position",
+                // Setup
+                () => ({
+                    connections: mockConnectionsData,
+                    expectedGroups: 3 // Software Engineer, Product Manager, Data Scientist
+                }),
+                // Functionality
+                (data) => {
+                    const professionGroups = {};
+                    data.connections.forEach(c => {
+                        if (!professionGroups[c.position]) {
+                            professionGroups[c.position] = [];
+                        }
+                        professionGroups[c.position].push(c);
+                    });
+                    return professionGroups;
+                },
+                // Validation
+                (result, data) => ({
+                    passed: Object.keys(result).length === data.expectedGroups,
+                    error: Object.keys(result).length !== data.expectedGroups ?
+                           `Expected ${data.expectedGroups} profession groups, Got: ${Object.keys(result).length}` : null
+                })
+            ));
+
+            return suite;
+        }
+
+        // ===================================================================
+        // TEST SUITE 3: DATA AGGREGATION FUNCTIONS
+        // ===================================================================
+        function testDataAggregation() {
+            const suite = createTestSuite("Data Aggregation Functions");
+
+            // Test 3.1: Count connections per company
+            suite.addTest(runTest(
+                "Company Stats - Should count connections per company correctly",
+                // Setup
+                () => ({
+                    connections: mockConnectionsData,
+                    expected: {
+                        'Google': 2,
+                        'Microsoft': 2,
+                        'Amazon': 1
+                    }
+                }),
+                // Functionality
+                (data) => {
+                    const stats = {};
+                    data.connections.forEach(c => {
+                        stats[c.company] = (stats[c.company] || 0) + 1;
+                    });
+                    return stats;
+                },
+                // Validation
+                (result, data) => {
+                    const passed = Object.keys(data.expected).every(company =>
+                        result[company] === data.expected[company]
+                    );
+                    return {
+                        passed,
+                        error: !passed ?
+                               `Expected: ${JSON.stringify(data.expected)}, Got: ${JSON.stringify(result)}` : null
+                    };
+                }
+            ));
+
+            // Test 3.2: Count connections per year
+            suite.addTest(runTest(
+                "Yearly Stats - Should count connections per year correctly",
+                // Setup
+                () => ({
+                    connections: mockConnectionsData,
+                    expected: {
+                        2020: 2,
+                        2021: 2,
+                        2022: 1
+                    }
+                }),
+                // Functionality
+                (data) => {
+                    const stats = {};
+                    data.connections.forEach(c => {
+                        const year = new Date(c.connectedOn).getFullYear();
+                        stats[year] = (stats[year] || 0) + 1;
+                    });
+                    return stats;
+                },
+                // Validation
+                (result, data) => {
+                    const passed = Object.keys(data.expected).every(year =>
+                        result[year] === data.expected[year]
+                    );
+                    return {
+                        passed,
+                        error: !passed ?
+                               `Expected: ${JSON.stringify(data.expected)}, Got: ${JSON.stringify(result)}` : null
+                    };
+                }
+            ));
+
+            // Test 3.3: Calculate total connections
+            suite.addTest(runTest(
+                "Total Connections - Should calculate total connection count",
+                // Setup
+                () => ({
+                    connections: mockConnectionsData,
+                    expectedTotal: 5
+                }),
+                // Functionality
+                (data) => data.connections.length,
+                // Validation
+                (result, data) => ({
+                    passed: result === data.expectedTotal,
+                    error: result !== data.expectedTotal ?
+                           `Expected ${data.expectedTotal} total connections, Got: ${result}` : null
+                })
+            ));
+
+            // Test 3.4: Find most common position
+            suite.addTest(runTest(
+                "Most Common Position - Should identify the most common position",
+                // Setup
+                () => ({
+                    connections: mockConnectionsData,
+                    expectedPosition: "Software Engineer"
+                }),
+                // Functionality
+                (data) => {
+                    const positionCounts = {};
+                    data.connections.forEach(c => {
+                        positionCounts[c.position] = (positionCounts[c.position] || 0) + 1;
+                    });
+                    return Object.keys(positionCounts).reduce((a, b) =>
+                        positionCounts[a] > positionCounts[b] ? a : b
+                    );
+                },
+                // Validation
+                (result, data) => ({
+                    passed: result === data.expectedPosition,
+                    error: result !== data.expectedPosition ?
+                           `Expected '${data.expectedPosition}', Got: '${result}'` : null
+                })
+            ));
+
+            // Test 3.5: Calculate connections per month
+            suite.addTest(runTest(
+                "Monthly Distribution - Should distribute connections across months",
+                // Setup
+                () => ({
+                    connections: mockConnectionsData,
+                    expectedMonths: 5 // May, June, March, April, January
+                }),
+                // Functionality
+                (data) => {
+                    const monthStats = {};
+                    data.connections.forEach(c => {
+                        const date = new Date(c.connectedOn);
+                        const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+                        monthStats[monthKey] = (monthStats[monthKey] || 0) + 1;
+                    });
+                    return monthStats;
+                },
+                // Validation
+                (result, data) => ({
+                    passed: Object.keys(result).length === data.expectedMonths,
+                    error: Object.keys(result).length !== data.expectedMonths ?
+                           `Expected ${data.expectedMonths} different months, Got: ${Object.keys(result).length}` : null
+                })
+            ));
+
+            return suite;
+        }
+
+        // ===================================================================
+        // TEST SUITE 4: HIERARCHICAL DATA STRUCTURE FUNCTIONS
+        // ===================================================================
+        function testHierarchicalStructures() {
+            const suite = createTestSuite("Hierarchical Data Structure Functions");
+
+            // Test 4.1: Build company hierarchy
+            suite.addTest(runTest(
+                "Company Hierarchy - Should create proper company-person hierarchy",
+                // Setup
+                () => ({
+                    connections: mockConnectionsData,
+                    expectedDepth: 2 // Root -> Company -> Person
+                }),
+                // Functionality
+                (data) => {
+                    const root = {
+                        name: "You",
+                        children: []
+                    };
+
+                    const companyMap = {};
+                    data.connections.forEach(c => {
+                        if (!companyMap[c.company]) {
+                            companyMap[c.company] = {
+                                name: c.company,
+                                children: []
+                            };
+                        }
+                        companyMap[c.company].children.push({
+                            name: c.fullName,
+                            data: c
+                        });
+                    });
+
+                    root.children = Object.values(companyMap);
+                    return root;
+                },
+                // Validation
+                (result, data) => {
+                    const hasRoot = result.name === "You";
+                    const hasCompanies = result.children.length === 3; // Google, Microsoft, Amazon
+                    const hasConnections = result.children.every(c => c.children.length > 0);
+                    const passed = hasRoot && hasCompanies && hasConnections;
+
+                    return {
+                        passed,
+                        error: !passed ?
+                               `Hierarchy validation failed. Root: ${hasRoot}, Companies: ${hasCompanies}, Connections: ${hasConnections}` : null
+                    };
+                }
+            ));
+
+            // Test 4.2: Build profession-based hierarchy
+            suite.addTest(runTest(
+                "Profession Hierarchy - Should create company -> profession -> person hierarchy",
+                // Setup
+                () => ({
+                    connections: mockConnectionsData.filter(c => c.company === 'Google'),
+                    companyName: 'Google'
+                }),
+                // Functionality
+                (data) => {
+                    const companyNode = {
+                        name: data.companyName,
+                        children: []
+                    };
+
+                    const professionMap = {};
+                    data.connections.forEach(c => {
+                        if (!professionMap[c.position]) {
+                            professionMap[c.position] = {
+                                name: c.position,
+                                children: []
+                            };
+                        }
+                        professionMap[c.position].children.push({
+                            name: c.fullName,
+                            data: c
+                        });
+                    });
+
+                    companyNode.children = Object.values(professionMap);
+                    return companyNode;
+                },
+                // Validation
+                (result, data) => {
+                    const hasCompanyNode = result.name === data.companyName;
+                    const hasProfessions = result.children.length === 1; // Only "Software Engineer" at Google
+                    const hasPersons = result.children[0].children.length === 2; // John and Jane
+                    const passed = hasCompanyNode && hasProfessions && hasPersons;
+
+                    return {
+                        passed,
+                        error: !passed ?
+                               `Profession hierarchy failed. Company: ${hasCompanyNode}, Professions: ${hasProfessions}, Persons: ${hasPersons}` : null
+                    };
+                }
+            ));
+
+            // Test 4.3: Calculate hierarchy depth
+            suite.addTest(runTest(
+                "Hierarchy Depth - Should calculate correct depth of hierarchy",
+                // Setup
+                () => ({
+                    hierarchy: {
+                        name: "Root",
+                        children: [
+                            {
+                                name: "Level1",
+                                children: [
+                                    {
+                                        name: "Level2",
+                                        children: []
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    expectedDepth: 3
+                }),
+                // Functionality
+                (data) => {
+                    function calculateDepth(node, currentDepth = 1) {
+                        if (!node.children || node.children.length === 0) {
+                            return currentDepth;
+                        }
+                        return Math.max(...node.children.map(child =>
+                            calculateDepth(child, currentDepth + 1)
+                        ));
+                    }
+                    return calculateDepth(data.hierarchy);
+                },
+                // Validation
+                (result, data) => ({
+                    passed: result === data.expectedDepth,
+                    error: result !== data.expectedDepth ?
+                           `Expected depth ${data.expectedDepth}, Got: ${result}` : null
+                })
+            ));
+
+            // Test 4.4: Count leaf nodes
+            suite.addTest(runTest(
+                "Count Leaf Nodes - Should count all leaf nodes in hierarchy",
+                // Setup
+                () => ({
+                    connections: mockConnectionsData,
+                    expectedLeafCount: 5 // 5 individual connections
+                }),
+                // Functionality
+                (data) => {
+                    const root = {
+                        name: "You",
+                        children: []
+                    };
+
+                    const companyMap = {};
+                    data.connections.forEach(c => {
+                        if (!companyMap[c.company]) {
+                            companyMap[c.company] = { name: c.company, children: [] };
+                        }
+                        companyMap[c.company].children.push({ name: c.fullName, data: c });
+                    });
+
+                    root.children = Object.values(companyMap);
+
+                    // Count leaf nodes
+                    function countLeaves(node) {
+                        if (!node.children || node.children.length === 0) return 1;
+                        return node.children.reduce((sum, child) => sum + countLeaves(child), 0);
+                    }
+
+                    return countLeaves(root);
+                },
+                // Validation
+                (result, data) => ({
+                    passed: result === data.expectedLeafCount,
+                    error: result !== data.expectedLeafCount ?
+                           `Expected ${data.expectedLeafCount} leaf nodes, Got: ${result}` : null
+                })
+            ));
+
+            return suite;
+        }
+
+        // ===================================================================
+        // TEST SUITE 5: CAREER TIMELINE FUNCTIONS
+        // ===================================================================
+        function testCareerTimeline() {
+            const suite = createTestSuite("Career Timeline Functions");
+
+            // Test 5.1: Calculate position duration
+            suite.addTest(runTest(
+                "Position Duration - Should calculate duration of a position in months",
+                // Setup
+                () => ({
+                    position: mockPositionsData[0],
+                    expectedMonths: 35 // 2018-01-01 to 2020-12-31 = 35 months (2 years * 12 + 11 months)
+                }),
+                // Functionality
+                (data) => {
+                    const start = parseCareerDate(data.position.startDate);
+                    const end = parseCareerDate(data.position.endDate);
+                    const months = (end.getFullYear() - start.getFullYear()) * 12 +
+                                  (end.getMonth() - start.getMonth());
+                    return months;
+                },
+                // Validation
+                (result, data) => ({
+                    passed: result === data.expectedMonths,
+                    error: result !== data.expectedMonths ?
+                           `Expected ${data.expectedMonths} months, Got: ${result}` : null
+                })
+            ));
+
+            // Test 5.2: Identify current position
+            suite.addTest(runTest(
+                "Current Position - Should identify position with no end date as current",
+                // Setup
+                () => ({
+                    positions: mockPositionsData,
+                    expectedCompany: "Amazon"
+                }),
+                // Functionality
+                (data) => {
+                    const currentPosition = data.positions.find(p => !p.endDate || p.endDate === '');
+                    return currentPosition ? currentPosition.companyName : null;
+                },
+                // Validation
+                (result, data) => ({
+                    passed: result === data.expectedCompany,
+                    error: result !== data.expectedCompany ?
+                           `Expected current position at '${data.expectedCompany}', Got: '${result}'` : null
+                })
+            ));
+
+            // Test 5.3: Sort positions chronologically
+            suite.addTest(runTest(
+                "Chronological Sort - Should sort positions by start date",
+                // Setup
+                () => ({
+                    positions: [...mockPositionsData].reverse(), // Reverse to test sorting
+                    expectedFirstCompany: "Google"
+                }),
+                // Functionality
+                (data) => {
+                    const sorted = [...data.positions].sort((a, b) => {
+                        const dateA = parseCareerDate(a.startDate);
+                        const dateB = parseCareerDate(b.startDate);
+                        return dateA - dateB;
+                    });
+                    return sorted;
+                },
+                // Validation
+                (result, data) => ({
+                    passed: result[0].companyName === data.expectedFirstCompany,
+                    error: result[0].companyName !== data.expectedFirstCompany ?
+                           `Expected first position at '${data.expectedFirstCompany}', Got: '${result[0].companyName}'` : null
+                })
+            ));
+
+            // Test 5.4: Calculate total career length
+            suite.addTest(runTest(
+                "Total Career Length - Should calculate total career duration",
+                // Setup
+                () => ({
+                    positions: mockPositionsData,
+                    expectedMinYears: 5 // 2018 to 2023+
+                }),
+                // Functionality
+                (data) => {
+                    const startDates = data.positions.map(p => parseCareerDate(p.startDate));
+                    const earliestStart = new Date(Math.min(...startDates));
+                    const now = new Date();
+                    const years = now.getFullYear() - earliestStart.getFullYear();
+                    return years;
+                },
+                // Validation
+                (result, data) => ({
+                    passed: result >= data.expectedMinYears,
+                    error: result < data.expectedMinYears ?
+                           `Expected at least ${data.expectedMinYears} years of experience, Got: ${result}` : null
+                })
+            ));
+
+            // Test 5.5: Match connections to positions
+            suite.addTest(runTest(
+                "Connection-Position Match - Should match connections to career positions by date",
+                // Setup
+                () => ({
+                    connections: mockConnectionsData.filter(c => c.company === "Google"),
+                    position: mockPositionsData[0], // Google 2018-2020
+                    expectedMatches: 2 // Both Google connections in 2020
+                }),
+                // Functionality
+                (data) => {
+                    const posStart = parseCareerDate(data.position.startDate);
+                    const posEnd = parseCareerDate(data.position.endDate);
+
+                    const matches = data.connections.filter(c => {
+                        const connDate = new Date(c.connectedOn);
+                        return connDate >= posStart && connDate <= posEnd;
+                    });
+
+                    return matches.length;
+                },
+                // Validation
+                (result, data) => ({
+                    passed: result === data.expectedMatches,
+                    error: result !== data.expectedMatches ?
+                           `Expected ${data.expectedMatches} matching connections, Got: ${result}` : null
+                })
+            ));
+
+            return suite;
+        }
+
+        // ===================================================================
+        // TEST SUITE 6: SEARCH AND QUERY FUNCTIONS
+        // ===================================================================
+        function testSearchAndQuery() {
+            const suite = createTestSuite("Search and Query Functions");
+
+            // Test 6.1: Search by name (case-insensitive)
+            suite.addTest(runTest(
+                "Name Search - Should find connections by name (case-insensitive)",
+                // Setup
+                () => ({
+                    connections: mockConnectionsData,
+                    query: "john",
+                    expectedResults: 2 // John Smith and Bob Johnson
+                }),
+                // Functionality
+                (data) => {
+                    const query = data.query.toLowerCase();
+                    return data.connections.filter(c =>
+                        c.fullName.toLowerCase().includes(query)
+                    );
+                },
+                // Validation
+                (result, data) => ({
+                    passed: result.length === data.expectedResults,
+                    error: result.length !== data.expectedResults ?
+                           `Expected ${data.expectedResults} results for '${data.query}', Got: ${result.length}` : null
+                })
+            ));
+
+            // Test 6.2: Search by company
+            suite.addTest(runTest(
+                "Company Search - Should find connections by company name",
+                // Setup
+                () => ({
+                    connections: mockConnectionsData,
+                    query: "Microsoft",
+                    expectedResults: 2
+                }),
+                // Functionality
+                (data) => {
+                    return data.connections.filter(c =>
+                        c.company.toLowerCase().includes(data.query.toLowerCase())
+                    );
+                },
+                // Validation
+                (result, data) => ({
+                    passed: result.length === data.expectedResults,
+                    error: result.length !== data.expectedResults ?
+                           `Expected ${data.expectedResults} results for '${data.query}', Got: ${result.length}` : null
+                })
+            ));
+
+            // Test 6.3: Search by position
+            suite.addTest(runTest(
+                "Position Search - Should find connections by position title",
+                // Setup
+                () => ({
+                    connections: mockConnectionsData,
+                    query: "engineer",
+                    expectedResults: 3 // All Software Engineers
+                }),
+                // Functionality
+                (data) => {
+                    return data.connections.filter(c =>
+                        c.position.toLowerCase().includes(data.query.toLowerCase())
+                    );
+                },
+                // Validation
+                (result, data) => ({
+                    passed: result.length === data.expectedResults,
+                    error: result.length !== data.expectedResults ?
+                           `Expected ${data.expectedResults} results for '${data.query}', Got: ${result.length}` : null
+                })
+            ));
+
+            // Test 6.4: Multi-field search
+            suite.addTest(runTest(
+                "Multi-field Search - Should search across name, company, and position",
+                // Setup
+                () => ({
+                    connections: mockConnectionsData,
+                    query: "software",
+                    expectedResults: 3 // All with "Software Engineer"
+                }),
+                // Functionality
+                (data) => {
+                    const query = data.query.toLowerCase();
+                    return data.connections.filter(c =>
+                        c.fullName.toLowerCase().includes(query) ||
+                        c.company.toLowerCase().includes(query) ||
+                        c.position.toLowerCase().includes(query)
+                    );
+                },
+                // Validation
+                (result, data) => ({
+                    passed: result.length === data.expectedResults,
+                    error: result.length !== data.expectedResults ?
+                           `Expected ${data.expectedResults} results for '${data.query}', Got: ${result.length}` : null
+                })
+            ));
+
+            // Test 6.5: Empty search returns all
+            suite.addTest(runTest(
+                "Empty Search - Should return all connections for empty query",
+                // Setup
+                () => ({
+                    connections: mockConnectionsData,
+                    query: "",
+                    expectedResults: 5
+                }),
+                // Functionality
+                (data) => {
+                    if (!data.query || data.query.trim() === '') {
+                        return data.connections;
+                    }
+                    return data.connections.filter(c =>
+                        c.fullName.toLowerCase().includes(data.query.toLowerCase())
+                    );
+                },
+                // Validation
+                (result, data) => ({
+                    passed: result.length === data.expectedResults,
+                    error: result.length !== data.expectedResults ?
+                           `Expected all ${data.expectedResults} connections for empty query, Got: ${result.length}` : null
+                })
+            ));
+
+            return suite;
+        }
+
+        // ===================================================================
+        // TEST SUITE 7: DATE AND TIME FUNCTIONS
+        // ===================================================================
+        function testDateTimeFunctions() {
+            const suite = createTestSuite("Date and Time Functions");
+
+            // Test 7.1: Extract year from date
+            suite.addTest(runTest(
+                "Extract Year - Should extract year from date string",
+                // Setup
+                () => ({
+                    dateString: "2020-05-15",
+                    expectedYear: 2020
+                }),
+                // Functionality
+                (data) => new Date(data.dateString).getFullYear(),
+                // Validation
+                (result, data) => ({
+                    passed: result === data.expectedYear,
+                    error: result !== data.expectedYear ?
+                           `Expected year ${data.expectedYear}, Got: ${result}` : null
+                })
+            ));
+
+            // Test 7.2: Check if date is in range
+            suite.addTest(runTest(
+                "Date Range Check - Should verify if date is within range",
+                // Setup
+                () => ({
+                    date: "2020-06-15",
+                    rangeStart: "2020-01-01",
+                    rangeEnd: "2020-12-31",
+                    expectedInRange: true
+                }),
+                // Functionality
+                (data) => {
+                    const date = new Date(data.date);
+                    const start = new Date(data.rangeStart);
+                    const end = new Date(data.rangeEnd);
+                    return date >= start && date <= end;
+                },
+                // Validation
+                (result, data) => ({
+                    passed: result === data.expectedInRange,
+                    error: result !== data.expectedInRange ?
+                           `Expected date to be ${data.expectedInRange ? 'in' : 'out of'} range, Got opposite` : null
+                })
+            ));
+
+            // Test 7.3: Calculate days between dates
+            suite.addTest(runTest(
+                "Days Between - Should calculate days between two dates",
+                // Setup
+                () => ({
+                    date1: "2020-01-01",
+                    date2: "2020-01-31",
+                    expectedDays: 30
+                }),
+                // Functionality
+                (data) => {
+                    const d1 = new Date(data.date1);
+                    const d2 = new Date(data.date2);
+                    const diffTime = Math.abs(d2 - d1);
+                    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                    return diffDays;
+                },
+                // Validation
+                (result, data) => ({
+                    passed: result === data.expectedDays,
+                    error: result !== data.expectedDays ?
+                           `Expected ${data.expectedDays} days, Got: ${result}` : null
+                })
+            ));
+
+            // Test 7.4: Get month name
+            suite.addTest(runTest(
+                "Month Name - Should get month name from date",
+                // Setup
+                () => ({
+                    date: "2020-05-15",
+                    expectedMonth: "May"
+                }),
+                // Functionality
+                (data) => {
+                    const date = new Date(data.date);
+                    return date.toLocaleDateString('en-US', { month: 'long' });
+                },
+                // Validation
+                (result, data) => ({
+                    passed: result === data.expectedMonth,
+                    error: result !== data.expectedMonth ?
+                           `Expected month '${data.expectedMonth}', Got: '${result}'` : null
+                })
+            ));
+
+            // Test 7.5: Sort dates chronologically
+            suite.addTest(runTest(
+                "Sort Dates - Should sort dates in chronological order",
+                // Setup
+                () => ({
+                    dates: ["2021-03-15", "2020-01-10", "2022-06-20"],
+                    expectedFirst: "2020-01-10"
+                }),
+                // Functionality
+                (data) => {
+                    const sorted = [...data.dates].sort((a, b) => new Date(a) - new Date(b));
+                    return sorted;
+                },
+                // Validation
+                (result, data) => ({
+                    passed: result[0] === data.expectedFirst,
+                    error: result[0] !== data.expectedFirst ?
+                           `Expected first date '${data.expectedFirst}', Got: '${result[0]}'` : null
+                })
+            ));
+
+            return suite;
+        }
+
+        // ===================================================================
+        // TEST SUITE 8: VALIDATION FUNCTIONS
+        // ===================================================================
+        function testValidationFunctions() {
+            const suite = createTestSuite("Validation Functions");
+
+            // Test 8.1: Validate email format
+            suite.addTest(runTest(
+                "Email Validation - Should validate email address format",
+                // Setup
+                () => ({
+                    email: "john.smith@example.com",
+                    expectedValid: true
+                }),
+                // Functionality
+                (data) => {
+                    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                    return emailRegex.test(data.email);
+                },
+                // Validation
+                (result, data) => ({
+                    passed: result === data.expectedValid,
+                    error: result !== data.expectedValid ?
+                           `Expected email to be ${data.expectedValid ? 'valid' : 'invalid'}, Got opposite` : null
+                })
+            ));
+
+            // Test 8.2: Validate invalid email
+            suite.addTest(runTest(
+                "Invalid Email - Should reject invalid email format",
+                // Setup
+                () => ({
+                    email: "not-an-email",
+                    expectedValid: false
+                }),
+                // Functionality
+                (data) => {
+                    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                    return emailRegex.test(data.email);
+                },
+                // Validation
+                (result, data) => ({
+                    passed: result === data.expectedValid,
+                    error: result !== data.expectedValid ?
+                           `Expected email to be ${data.expectedValid ? 'valid' : 'invalid'}, Got opposite` : null
+                })
+            ));
+
+            // Test 8.3: Validate required fields
+            suite.addTest(runTest(
+                "Required Fields - Should validate that required fields are present",
+                // Setup
+                () => ({
+                    connection: mockConnectionsData[0],
+                    requiredFields: ['fullName', 'company', 'position', 'connectedOn']
+                }),
+                // Functionality
+                (data) => {
+                    return data.requiredFields.every(field =>
+                        data.connection.hasOwnProperty(field) &&
+                        data.connection[field] !== null &&
+                        data.connection[field] !== ''
+                    );
+                },
+                // Validation
+                (result, data) => ({
+                    passed: result === true,
+                    error: !result ? `Missing required fields in connection data` : null
+                })
+            ));
+
+            // Test 8.4: Validate URL format
+            suite.addTest(runTest(
+                "URL Validation - Should validate LinkedIn URL format",
+                // Setup
+                () => ({
+                    url: "https://linkedin.com/in/johnsmith",
+                    expectedValid: true
+                }),
+                // Functionality
+                (data) => {
+                    try {
+                        new URL(data.url);
+                        return data.url.includes('linkedin.com');
+                    } catch {
+                        return false;
+                    }
+                },
+                // Validation
+                (result, data) => ({
+                    passed: result === data.expectedValid,
+                    error: result !== data.expectedValid ?
+                           `Expected URL to be ${data.expectedValid ? 'valid' : 'invalid'}, Got opposite` : null
+                })
+            ));
+
+            // Test 8.5: Validate date format
+            suite.addTest(runTest(
+                "Date Format Validation - Should validate YYYY-MM-DD format",
+                // Setup
+                () => ({
+                    date: "2020-05-15",
+                    expectedValid: true
+                }),
+                // Functionality
+                (data) => {
+                    const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
+                    if (!dateRegex.test(data.date)) return false;
+                    const parsed = new Date(data.date);
+                    return !isNaN(parsed.getTime());
+                },
+                // Validation
+                (result, data) => ({
+                    passed: result === data.expectedValid,
+                    error: result !== data.expectedValid ?
+                           `Expected date to be ${data.expectedValid ? 'valid' : 'invalid'}, Got opposite` : null
+                })
+            ));
+
+            return suite;
+        }
+
+        // ===================================================================
+        // MAIN TEST EXECUTION
+        // ===================================================================
+        function runAllTests() {
+            // Clear previous results
+            testResults.total = 0;
+            testResults.passed = 0;
+            testResults.failed = 0;
+            testResults.suites = [];
+
+            // Run all test suites
+            testResults.suites.push(testDataProcessing());
+            testResults.suites.push(testDataFiltering());
+            testResults.suites.push(testDataAggregation());
+            testResults.suites.push(testHierarchicalStructures());
+            testResults.suites.push(testCareerTimeline());
+            testResults.suites.push(testSearchAndQuery());
+            testResults.suites.push(testDateTimeFunctions());
+            testResults.suites.push(testValidationFunctions());
+
+            // Display results
+            displayResults();
+        }
+
+        function displayResults() {
+            const resultsDiv = document.getElementById('testResults');
+            resultsDiv.innerHTML = '';
+
+            testResults.suites.forEach(suite => {
+                const suiteDiv = document.createElement('div');
+                suiteDiv.className = 'test-suite';
+
+                let suiteHTML = `<h2>${suite.name}</h2>`;
+
+                suite.tests.forEach(test => {
+                    const testClass = test.passed ? 'passed' : 'failed';
+                    const resultClass = test.passed ? 'pass' : 'fail';
+                    const resultText = test.passed ? '✅ PASSED' : '❌ FAILED';
+
+                    // Escape HTML for display
+                    const escapeForDisplay = (str) => {
+                        return str.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+                    };
+
+                    suiteHTML += `
+                        <div class="test-case ${testClass}">
+                            <div class="test-name">${test.name}</div>
+                            <div class="test-section">
+                                <strong>Setup:</strong> <code>${escapeForDisplay(test.setup.toString().substring(0, 200))}</code>...
+                            </div>
+                            <div class="test-section">
+                                <strong>Functionality:</strong> <code>${escapeForDisplay(test.functionality.toString().substring(0, 200))}</code>...
+                            </div>
+                            <div class="test-section">
+                                <strong>Validation:</strong> <code>${escapeForDisplay(test.validation.toString().substring(0, 200))}</code>...
+                            </div>
+                            <div class="test-result ${resultClass}">${resultText}</div>
+                            ${test.error ? `<div class="error-details">Error: ${escapeForDisplay(test.error)}</div>` : ''}
+                        </div>
+                    `;
+                });
+
+                suiteDiv.innerHTML = suiteHTML;
+                resultsDiv.appendChild(suiteDiv);
+            });
+
+            // Update summary
+            document.getElementById('summary').style.display = 'flex';
+            document.getElementById('totalTests').textContent = testResults.total;
+            document.getElementById('passedTests').textContent = testResults.passed;
+            document.getElementById('failedTests').textContent = testResults.failed;
+            const passRate = testResults.total > 0 ?
+                            Math.round((testResults.passed / testResults.total) * 100) : 0;
+            document.getElementById('passRate').textContent = passRate + '%';
+        }
+
+        function clearResults() {
+            document.getElementById('testResults').innerHTML = '';
+            document.getElementById('summary').style.display = 'none';
+            testResults.total = 0;
+            testResults.passed = 0;
+            testResults.failed = 0;
+            testResults.suites = [];
+        }
+    </script>
+</body>
+</html>

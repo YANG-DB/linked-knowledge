@@ -1,5 +1,9 @@
 # LinkedIn Knowledge Graph Explorer
 
+![Tests](https://github.com/YOUR_USERNAME/linked-knowledge/workflows/Run%20Tests/badge.svg)
+![License](https://img.shields.io/badge/license-MIT-blue.svg)
+![Version](https://img.shields.io/badge/version-1.0.0-green.svg)
+
 A modern, interactive web application for visualizing and exploring your LinkedIn network connections using force-directed graph visualization.
 
 ## 📸 Screenshots & Demos
@@ -363,6 +367,62 @@ To fetch live LinkedIn data, you would need to:
 - **No server uploads**: No data is sent to any external servers
 - **No tracking**: No analytics or tracking scripts
 - **Your data, your control**: Export and delete as you wish
+
+## 🧪 Testing
+
+This project includes a comprehensive functional test suite with 40+ tests covering all core functionality.
+
+### Running Tests Locally
+
+```bash
+# Install dependencies
+npm install
+
+# Run tests (requires Playwright)
+npm test
+
+# Or run tests with local installation
+npm run test:local
+
+# Serve the test page manually
+npm run serve
+# Then open http://localhost:8000/tests.html
+```
+
+### Test Coverage
+
+- ✅ **Data Processing** (6 tests): HTML escaping, date parsing/formatting
+- ✅ **Data Filtering** (5 tests): Company, year, position filters
+- ✅ **Data Aggregation** (5 tests): Statistics and counting
+- ✅ **Hierarchical Structures** (4 tests): Tree building and depth calculation
+- ✅ **Career Timeline** (5 tests): Position duration and matching
+- ✅ **Search & Query** (5 tests): Multi-field search functionality
+- ✅ **Date & Time** (5 tests): Date manipulation and validation
+- ✅ **Validation** (5 tests): Email, URL, and data validation
+
+### CI/CD Pipeline
+
+The project uses **GitHub Actions** to automatically run tests on every push and pull request:
+
+- ✅ **Automated Testing**: Tests run on Node.js 18.x and 20.x
+- ✅ **Multi-browser Support**: Uses Playwright with Chromium
+- ✅ **Test Reports**: JSON and HTML reports generated for each run
+- ✅ **PR Comments**: Test results automatically posted to pull requests
+- ✅ **Build Artifacts**: Test reports saved for 7 days
+- ✅ **HTML Linting**: Code quality checks with HTMLHint
+
+**Workflow Triggers:**
+- Push to `main` or `develop` branches
+- Pull requests to `main` or `develop`
+- Manual workflow dispatch
+
+View test results in the [Actions tab](https://github.com/YOUR_USERNAME/linked-knowledge/actions) of the repository.
+
+### Test Documentation
+
+For detailed information about the test suite, see:
+- [TESTING_README.md](TESTING_README.md) - Complete testing guide
+- [TEST_SCENARIOS.md](TEST_SCENARIOS.md) - Individual test scenarios and expected results
 
 ## 🤝 Contributing
 

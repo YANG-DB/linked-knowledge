@@ -1,0 +1,26 @@
+{
+  "name": "linkedin-knowledge-graph",
+  "version": "1.0.0",
+  "description": "LinkedIn Knowledge Graph Explorer - Visualize and explore your professional network",
+  "main": "index.html",
+  "scripts": {
+    "test": "node run-tests.js",
+    "test:local": "npx playwright install chromium && node run-tests.js",
+    "serve": "npx http-server -p 8000",
+    "lint": "htmlhint *.html"
+  },
+  "keywords": [
+    "linkedin",
+    "network",
+    "visualization",
+    "d3",
+    "graph"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "playwright": "^1.40.0",
+    "htmlhint": "^1.1.4",
+    "http-server": "^14.1.1"
+  }
+}
